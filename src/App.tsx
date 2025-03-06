@@ -1,6 +1,4 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
 import { sendOrderConfirmation } from "./emailService";
 
@@ -34,42 +32,42 @@ function App() {
       id: 1,
       name: "Handcrafted Ceramic Mug",
       price: 24.99,
-      image: "/images/1.png",
+      image: "danielsherif.github.io/images/1.png",
       description: "Beautiful handmade ceramic mug with unique design",
     },
     {
       id: 2,
       name: "Artisan Coffee Set",
       price: 49.99,
-      image: "/images/2.png",
+      image: "danielsherif.github.io/images/2.png",
       description: "Complete coffee set with handcrafted pottery pieces",
     },
     {
       id: 3,
       name: "Decorative Clay Vase",
       price: 34.99,
-      image: "/images/3.JPG",
+      image: "danielsherif.github.io/images/3.JPG",
       description: "Elegant clay vase perfect for home decoration",
     },
     {
       id: 4,
       name: "Pottery Bowl Set",
       price: 39.99,
-      image: "/images/4.JPG",
+      image: "danielsherif.github.io/images/4.JPG",
       description: "Set of handmade pottery bowls for your kitchen",
     },
     {
       id: 5,
       name: "Ceramic Tea Set",
       price: 54.99,
-      image: "/images/5.JPG",
+      image: "danielsherif.github.io/images/5.JPG",
       description: "Traditional ceramic tea set with intricate details",
     },
     {
       id: 6,
       name: "Clay Flower Pot",
       price: 29.99,
-      image: "/images/6.JPG",
+      image: "danielsherif.github.io/images/6.JPG",
       description: "Handcrafted clay flower pot for your plants",
     },
   ]);
