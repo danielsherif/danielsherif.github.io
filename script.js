@@ -228,4 +228,6 @@ function renderProducts(products) {
 document.addEventListener("DOMContentLoaded", () => {
   initCart();
   renderProducts(sampleProducts);
+  // Ensure checkout modal starts hidden
+  checkoutModal.classList.add("hidden");
 });
