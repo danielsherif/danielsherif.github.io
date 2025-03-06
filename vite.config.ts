@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: "/danielsherif.github.io/",
+  base: "/brewandclay.me/",
   build: {
     rollupOptions: {
       output: {
