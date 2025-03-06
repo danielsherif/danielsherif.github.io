@@ -111,9 +111,9 @@ cartToggle.addEventListener("click", () => {
   cartSidebar.classList.toggle("visible");
 });
 
-// Handle checkout button
-checkoutBtn.addEventListener("click", () => {
-  if (cart.items.length > 0) {
+// Handle checkout button - only show modal when clicked from cart sidebar
+checkoutBtn.addEventListener("click", (e) => {
+  if (cart.items.length > 0 && cartSidebar.classList.contains("visible")) {
     cartData.value = JSON.stringify(cart);
     checkoutModal.classList.remove("hidden");
     cartSidebar.classList.remove("visible");
