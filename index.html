@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,35 +11,42 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
         }
+
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 20px 0;
         }
+
         .cart-btn {
             padding: 10px 20px;
             cursor: pointer;
         }
+
         .products-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 20px;
             padding: 20px 0;
         }
+
         .product-card {
             border: 1px solid #ddd;
             padding: 15px;
             text-align: center;
         }
+
         .product-card img {
             max-width: 100%;
             height: auto;
         }
+
         .cart-modal {
             display: none;
             position: fixed;
@@ -48,22 +56,26 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
         }
+
         .cart-content {
             background: white;
             padding: 20px;
             max-width: 500px;
             margin: 50px auto;
         }
+
         .checkout-form {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
+
         .checkout-form input {
             padding: 8px;
         }
     </style>
 </head>
+
 <body>
     <header>
         <h1>Brew and Clay</h1>
@@ -83,6 +95,7 @@
                 <input type="text" placeholder="Name" id="name" required>
                 <input type="email" placeholder="Email" id="email" required>
                 <input type="tel" placeholder="Phone Number" id="phone" required>
+                <input type="text" placeholder="Address" id="address" required>
                 <button type="submit">Checkout</button>
             </form>
             <button onclick="toggleCart()">Close</button>
@@ -92,4 +105,5 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="js/app.js"></script>
 </body>
+
 </html>
