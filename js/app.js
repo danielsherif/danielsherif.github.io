@@ -96,15 +96,36 @@ document
       from_name: document.getElementById("name").value,
       from_email: document.getElementById("email").value,
       phone: document.getElementById("phone").value,
+      address: document.getElementById("address").value,
       cart_items: cart
         .map(
           (item) =>
-            `${item.name} - $${item.price.toFixed(2)} x ${item.quantity}`
+            `Product: ${item.name}\nPrice: $${item.price.toFixed(
+              2
+            )}\nQuantity: ${item.quantity}\nSubtotal: $${(
+              item.price * item.quantity
+            ).toFixed(2)}\n-------------------`
         )
         .join("\n"),
       total: cart
         .reduce((sum, item) => sum + item.price * item.quantity, 0)
         .toFixed(2),
+      order_summary: `Order Details:\n\nCustomer Information:\nName: ${
+        document.getElementById("name").value
+      }\nEmail: ${document.getElementById("email").value}\nPhone: ${
+        document.getElementById("phone").value
+      }\nAddress: ${
+        document.getElementById("address").value
+      }\n\nOrder Items:\n${cart
+        .map(
+          (item) =>
+            `${item.name} - $${item.price.toFixed(2)} x ${item.quantity} = $${(
+              item.price * item.quantity
+            ).toFixed(2)}`
+        )
+        .join("\n")}\n\nTotal Amount: $${cart
+        .reduce((sum, item) => sum + item.price * item.quantity, 0)
+        .toFixed(2)}`,
     };
 
     emailjs.send("service_z6jxwxf", "template_8co91g7", templateParams).then(
