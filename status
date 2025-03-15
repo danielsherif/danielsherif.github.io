@@ -4,10 +4,10 @@
 
 What needs to be done?
 
-⟢ Fix routing
 ⟢ Implement a search bar to allow users to search for products
 ⟢ Implement a filter system to allow users to filter products by category, price, and rating
 ⟢ Integrate MailJS into the system
 ⟢ Implement login/signup
 ⟢ Fix header showing wrong page
 ⟢ Add animations
+⟢ Fix routing

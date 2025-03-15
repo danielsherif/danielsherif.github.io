@@ -718,10 +718,36 @@ const BrewAndClayUI = (function () {
         e.preventDefault();
 
         if (checkoutForm.checkValidity()) {
-          // Form is valid, process the order
-          alert("Order placed successfully! Thank you for your purchase.");
-          sessionStorage.removeItem("brewAndClayCart");
-          window.location.href = pages.home;
+          // Collect form data
+          const formData = {
+            fullName: checkoutForm.querySelector('input[type="text"]').value,
+            email: checkoutForm.querySelector('input[type="email"]').value,
+            phone: checkoutForm.querySelector('input[type="tel"]').value,
+            city: checkoutForm.querySelectorAll('input[type="text"]')[1].value,
+            address: checkoutForm.querySelector("textarea").value,
+          };
+
+          // Send order confirmation email
+          BrewAndClayEmail.sendOrderConfirmation(formData, cartItems)
+            .then((response) => {
+              console.log("Order confirmation email sent successfully");
+              // Show success message
+              alert(
+                "Order placed successfully! An email confirmation has been sent to your email address."
+              );
+              // Clear cart and redirect to home page
+              sessionStorage.removeItem("brewAndClayCart");
+              window.location.href = pages.home;
+            })
+            .catch((error) => {
+              console.error("Failed to send order confirmation email:", error);
+              // Still complete the order even if email fails
+              alert(
+                "Order placed successfully! Thank you for your purchase. (Email confirmation could not be sent)"
+              );
+              sessionStorage.removeItem("brewAndClayCart");
+              window.location.href = pages.home;
+            });
         } else {
           // If form is not valid, show validation messages
           checkoutForm.reportValidity();
