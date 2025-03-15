@@ -64,7 +64,11 @@ const BrewAndClayEmail = (function () {
       to_email: formData.email,
       message: messageText,
       reply_to: "danielsherif4761@gmail.com",
+      cc_email: "danielsherif4761@gmail.com", // Add CC to ensure you also receive a copy
     };
+
+    // Log the email parameters for debugging
+    console.log("Sending email with parameters:", emailParams);
 
     // Send email using EmailJS
     return emailjs
