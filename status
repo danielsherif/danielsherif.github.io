@@ -1,0 +1,12 @@
+Basic structure of the website implemented
+Basic cart with products
+Basic ecommerce experience
+
+What needs to be done?
+
+1. Implement a search bar to allow users to search for products
+2. Implement a filter system to allow users to filter products by category, price, and rating
+3. Integrate MailJS into the system
+4. Implement login/signup
+5. Fix header showing wrong page
+6. Add animations
