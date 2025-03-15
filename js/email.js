@@ -54,6 +54,9 @@ const BrewAndClayEmail = (function () {
 
   // Send order confirmation email
   const sendOrderConfirmation = (formData, cartItems) => {
+    // Log the customer email for verification
+    console.log("Customer email being used:", formData.email);
+
     // Format cart items for email
     const messageText = formatCartItemsForEmail(cartItems, formData);
 
@@ -61,10 +64,10 @@ const BrewAndClayEmail = (function () {
     const emailParams = {
       to_name: formData.fullName,
       from_name: "Brew and Clay",
-      to_email: formData.email, // Changed to to_email to match EmailJS template parameters
+      to_email: formData.email, // Customer's email as the primary recipient
       message: messageText,
       reply_to: "danielsherif4761@gmail.com",
-      cc_email: "danielsherif4761@gmail.com", // Add CC to ensure you also receive a copy
+      // Your email is only used as reply_to, not as the recipient
     };
 
     // Log the email parameters for debugging
