@@ -61,7 +61,7 @@ const BrewAndClayEmail = (function () {
     const emailParams = {
       to_name: formData.fullName,
       from_name: "Brew and Clay",
-      email: formData.email, // Changed from to_email to email - standard EmailJS parameter
+      to_email: formData.email, // Changed to to_email to match EmailJS template parameters
       message: messageText,
       reply_to: "danielsherif4761@gmail.com",
       cc_email: "danielsherif4761@gmail.com", // Add CC to ensure you also receive a copy
