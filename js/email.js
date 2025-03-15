@@ -67,6 +67,7 @@ const BrewAndClayEmail = (function () {
       to_email: formData.email, // Customer's email as the primary recipient
       message: messageText,
       reply_to: "danielsherif4761@gmail.com",
+      cc: formData.email, // Explicitly set CC to customer's email to override template settings
       // Your email is only used as reply_to, not as the recipient
     };
 
