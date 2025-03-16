@@ -263,12 +263,281 @@ const BrewAndClayUI = (function () {
       // Display all products
       displayAllProducts();
     }
+
+    // Initialize filter functionality
+    initProductFilters();
+  };
+
+  // Initialize product filters
+  const initProductFilters = () => {
+    const filterContainer = document.querySelector(
+      ".bg-white.p-6.rounded-lg.shadow-sm"
+    );
+    if (!filterContainer) return;
+
+    // Get all filter checkboxes
+    const filterCheckboxes = filterContainer.querySelectorAll(
+      'input[type="checkbox"]'
+    );
+
+    // Get the Apply Filters button that's already in the HTML
+    const applyButton = document.getElementById("apply-filters-btn");
+    const clearButton = document.getElementById("clear-filters-btn");
+
+    if (applyButton) {
+      // Add click event listener to the Apply Filters button
+      applyButton.addEventListener("click", () => {
+        applyProductFilters();
+      });
+    }
+
+    if (clearButton) {
+      // Add click event listener to the Clear Filter button
+      clearButton.addEventListener("click", () => {
+        // Uncheck all filter checkboxes
+        filterCheckboxes.forEach((checkbox) => {
+          checkbox.checked = false;
+        });
+
+        // Display all products
+        displayAllProducts();
+      });
+    }
+
+    // Initialize sorting functionality
+    initSorting();
+  };
+
+  // Initialize sorting functionality
+  const initSorting = () => {
+    const sortSelect = document.querySelector(
+      ".rounded-button.border-gray-300.text-gray-700"
+    );
+
+    if (sortSelect) {
+      sortSelect.addEventListener("change", () => {
+        const selectedOption = sortSelect.value;
+        const products = document.querySelectorAll(".product-card");
+        const productsArray = Array.from(products);
+
+        // Get all products to sort
+        let allProducts = BrewAndClayDB.getAllProducts();
+
+        // Check if we have filtered products
+        const selectedCollections = getSelectedFilters("Collections");
+        const selectedPriceRanges = getSelectedFilters("Price Range");
+        const selectedColors = getSelectedFilters("Color");
+
+        // Apply filters if any are selected
+        if (
+          selectedCollections.length > 0 ||
+          selectedPriceRanges.length > 0 ||
+          selectedColors.length > 0
+        ) {
+          // Apply the same filtering logic as in applyProductFilters
+          if (selectedCollections.length > 0) {
+            allProducts = allProducts.filter((product) =>
+              selectedCollections.includes(product.category)
+            );
+          }
+
+          if (selectedPriceRanges.length > 0) {
+            allProducts = allProducts.filter((product) => {
+              const price = product.price;
+              return selectedPriceRanges.some((range) => {
+                if (range === "Under $25") return price < 25;
+                if (range === "$25 - $50") return price >= 25 && price <= 50;
+                if (range === "$50+") return price > 50;
+                return false;
+              });
+            });
+          }
+
+          if (selectedColors.length > 0) {
+            allProducts = allProducts.filter((product) => {
+              const productText = (
+                product.name +
+                " " +
+                product.description
+              ).toLowerCase();
+              return selectedColors.some((color) =>
+                productText.includes(color.toLowerCase())
+              );
+            });
+          }
+        }
+
+        // Sort products based on selected option
+        switch (selectedOption) {
+          case "Featured":
+            // No sorting needed, products are already in featured order
+            break;
+          case "Newest":
+            // For demo purposes, we'll just reverse the order
+            allProducts.reverse();
+            break;
+          case "Price: Low to High":
+            allProducts.sort((a, b) => {
+              const priceA =
+                typeof a.price === "number" ? a.price : parseFloat(a.price);
+              const priceB =
+                typeof b.price === "number" ? b.price : parseFloat(b.price);
+              return priceA - priceB;
+            });
+            break;
+          case "Price: High to Low":
+            allProducts.sort((a, b) => {
+              const priceA =
+                typeof a.price === "number" ? a.price : parseFloat(a.price);
+              const priceB =
+                typeof b.price === "number" ? b.price : parseFloat(b.price);
+              return priceB - priceA;
+            });
+            break;
+        }
+
+        // Render the sorted products
+        renderProductGrid(allProducts);
+      });
+    }
+  };
+
+  // Apply product filters
+  const applyProductFilters = () => {
+    // Get all products
+    const allProducts = BrewAndClayDB.getAllProducts();
+
+    // Get selected filters
+    const selectedCollections = getSelectedFilters("Collections");
+    const selectedPriceRanges = getSelectedFilters("Price Range");
+    const selectedColors = getSelectedFilters("Color");
+
+    // Filter products based on selected criteria
+    let filteredProducts = allProducts;
+
+    // Filter by collection
+    if (selectedCollections.length > 0) {
+      filteredProducts = filteredProducts.filter((product) =>
+        selectedCollections.includes(product.category)
+      );
+    }
+
+    // Filter by price range - Fixed implementation with proper number parsing
+    if (selectedPriceRanges.length > 0) {
+      console.log("Selected price ranges:", selectedPriceRanges);
+      filteredProducts = filteredProducts.filter((product) => {
+        const price = parseFloat(product.price);
+        console.log(`Evaluating product: ${product.name}, Price: ${price}`);
+        if (isNaN(price)) {
+          console.log("Invalid price - skipping product");
+          return false;
+        }
+        return selectedPriceRanges.some((range) => {
+          let result = false;
+          if (range === "Under $25") result = price < 25;
+          if (range === "$25 - $50") result = price >= 25 && price <= 50;
+          if (range === "$50+") result = price > 50;
+          console.log(`Range: ${range}, Price: ${price}, Matches: ${result}`);
+          return result;
+        });
+      });
+      console.log("Filtered products after price filtering:", filteredProducts);
+    }
+
+    // Filter by color (assuming color information is in the product name or description)
+    if (selectedColors.length > 0) {
+      filteredProducts = filteredProducts.filter((product) => {
+        const productText = (
+          product.name +
+          " " +
+          product.description
+        ).toLowerCase();
+        return selectedColors.some((color) =>
+          productText.includes(color.toLowerCase())
+        );
+      });
+    }
+
+    // Apply current sorting if any
+    const sortSelect = document.querySelector(
+      ".rounded-button.border-gray-300.text-gray-700"
+    );
+
+    if (sortSelect && sortSelect.value !== "Featured") {
+      const selectedOption = sortSelect.value;
+
+      // Sort products based on selected option
+      switch (selectedOption) {
+        case "Newest":
+          // For demo purposes, we'll just reverse the order
+          filteredProducts.reverse();
+          break;
+        case "Price: Low to High":
+          filteredProducts.sort(
+            (a, b) => parseFloat(a.price) - parseFloat(b.price)
+          );
+          break;
+        case "Price: High to Low":
+          filteredProducts.sort(
+            (a, b) => parseFloat(b.price) - parseFloat(a.price)
+          );
+          break;
+      }
+    }
+
+    // Render filtered products
+    renderProductGrid(filteredProducts);
+  };
+
+  // Get selected filters by category
+  const getSelectedFilters = (category) => {
+    const categoryHeader = Array.from(
+      document.querySelectorAll(".font-medium.text-gray-700.mb-2")
+    ).find((el) => el.textContent === category);
+
+    if (!categoryHeader) return [];
+
+    const filterContainer = categoryHeader.nextElementSibling;
+    const selectedCheckboxes = filterContainer.querySelectorAll(
+      'input[type="checkbox"]:checked'
+    );
+
+    return Array.from(selectedCheckboxes).map((checkbox) => {
+      return checkbox.nextElementSibling.textContent.trim();
+    });
   };
 
   // Display all products
   const displayAllProducts = () => {
     const products = BrewAndClayDB.getAllProducts();
-    renderProductGrid(products);
+
+    // Apply current sorting if any
+    const sortSelect = document.querySelector(
+      ".rounded-button.border-gray-300.text-gray-700"
+    );
+
+    if (sortSelect && sortSelect.value !== "Featured") {
+      const selectedOption = sortSelect.value;
+      let sortedProducts = [...products];
+
+      // Sort products based on selected option
+      switch (selectedOption) {
+        case "Newest":
+          // For demo purposes, we'll just reverse the order
+          sortedProducts.reverse();
+          break;
+        case "Price: Low to High":
+          sortedProducts.sort((a, b) => a.price - b.price);
+          break;
+        case "Price: High to Low":
+          sortedProducts.sort((a, b) => b.price - a.price);
+          break;
+      }
+
+      renderProductGrid(sortedProducts);
+    } else {
+      renderProductGrid(products);
+    }
   };
 
   // Display search results
@@ -344,6 +613,37 @@ const BrewAndClayUI = (function () {
     const productsContainer = document.querySelector(
       ".grid.grid-cols-1.md\\:grid-cols-3.gap-8"
     );
+
+    // Show message if no products match the filters
+    if (products.length === 0) {
+      productsContainer.innerHTML = `
+        <div class="col-span-3 py-8 text-center">
+          <p class="text-gray-500">No products match your selected filters.</p>
+          <button class="rounded-button mt-4 border border-custom text-custom py-2 px-4 hover:bg-custom hover:text-white transition-colors clear-filters-btn">
+            Clear Filters
+          </button>
+        </div>
+      `;
+
+      // Add event listener to clear filters button
+      const clearFiltersBtn =
+        productsContainer.querySelector(".clear-filters-btn");
+      if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener("click", () => {
+          // Uncheck all filter checkboxes
+          document
+            .querySelectorAll('input[type="checkbox"]')
+            .forEach((checkbox) => {
+              checkbox.checked = false;
+            });
+
+          // Display all products
+          displayAllProducts();
+        });
+      }
+
+      return;
+    }
 
     if (productsContainer) {
       // Clear existing content

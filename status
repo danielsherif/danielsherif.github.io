@@ -2,13 +2,24 @@
 ✔️ Basic cart with products
 ✔️ Basic ecommerce experience
 ✔️ Integrate MailJS
+✔️Send email to receipient
+
+
 
 What needs to be done?
-
-⟢ Send email to receipient 
+  
+⟢ Mobile
 ⟢ Implement a search bar to allow users to search for products
 ⟢ Implement a filter system to allow users to filter products by category, price, and rating
 ⟢ Implement login/signup
 ⟢ Fix header showing wrong page
 ⟢ Add animations
 ⟢ Fix routing
+⟢ Fix wrong pages in header
+⟢ Product statue
+⟢ Currency
+⟢ Products and description and quantity
+⟢ Page number
+⟢ SSL
+
+
