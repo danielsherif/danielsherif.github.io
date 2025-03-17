@@ -73,12 +73,10 @@ const BrewAndClayUI = (function () {
             link.classList.add("text-custom", "border-custom", "border-b-2");
           }
         } else if (index === 2) {
-          link.href = pages.shop + "?view=collections";
+          link.href = "Collections.html";
           link.textContent = "Collections";
-          // Check if we're on the collections view
-          const urlParams = new URLSearchParams(window.location.search);
-          const collectionView = urlParams.get("view") === "collections";
-          if (currentPage === pages.shop && collectionView) {
+          // Check if we're on the collections page
+          if (currentPage === "Collections.html") {
             link.classList.remove("text-gray-500");
             link.classList.add("text-custom", "border-custom", "border-b-2");
           }
@@ -104,7 +102,7 @@ const BrewAndClayUI = (function () {
           link.href = pages.shop;
           break;
         case "collections":
-          link.href = pages.shop + "?view=collections";
+          link.href = "Collections.html";
           break;
         case "about":
           link.href = pages.about;
@@ -263,9 +261,6 @@ const BrewAndClayUI = (function () {
     } else if (categoryFilter) {
       // Handle category filtering
       displayCategoryProducts(categoryFilter);
-    } else if (collectionView) {
-      // Handle collections view
-      displayCollections();
     } else {
       // Display all products
       displayAllProducts();
