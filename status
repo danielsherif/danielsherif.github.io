@@ -5,11 +5,11 @@
 ✔️ Send email to receipient
 ✔️ Filter by category/color
 ✔️ Mobile
+✔️ Fliter by price
 
 What needs to be done?
   
 ⟢ Search bar missing in mobile
-⟢ Fliter by price
 ⟢ Implement login/signup
 ⟢ Fix header showing wrong page
 ⟢ Add animations

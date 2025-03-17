@@ -342,13 +342,42 @@ const BrewAndClayUI = (function () {
           }
 
           if (selectedPriceRanges.length > 0) {
+            console.log("Selected price ranges (sort):", selectedPriceRanges);
             allProducts = allProducts.filter((product) => {
-              const price = product.price;
-              return selectedPriceRanges.some((range) => {
-                if (range === "Under $25") return price < 25;
-                if (range === "$25 - $50") return price >= 25 && price <= 50;
-                if (range === "$50+") return price > 50;
+              // Handle different price formats (string with $ or number)
+              let price;
+              if (typeof product.price === "string") {
+                // Remove currency symbol and any whitespace
+                price = parseFloat(product.price.replace(/[$\s,]/g, ""));
+                console.log(
+                  `Parsed string price for ${product.name}: '${product.price}' -> ${price}`
+                );
+              } else {
+                price = parseFloat(product.price);
+                console.log(
+                  `Using numeric price for ${product.name}: ${price}`
+                );
+              }
+
+              // Check if price is valid
+              if (isNaN(price)) {
+                console.error(
+                  `Invalid price for ${product.name}: ${
+                    product.price
+                  } (${typeof product.price})`
+                );
                 return false;
+              }
+
+              return selectedPriceRanges.some((range) => {
+                let result = false;
+                if (range === "Under $25") result = price < 25;
+                if (range === "$25 - $50") result = price >= 25 && price <= 50;
+                if (range === "$50+") result = price > 50;
+                console.log(
+                  `Range: ${range}, Product: ${product.name}, Price: ${price}, Matches: ${result}`
+                );
+                return result;
               });
             });
           }
@@ -378,19 +407,35 @@ const BrewAndClayUI = (function () {
             break;
           case "Price: Low to High":
             allProducts.sort((a, b) => {
+              // Handle different price formats consistently
               const priceA =
-                typeof a.price === "number" ? a.price : parseFloat(a.price);
+                typeof a.price === "number"
+                  ? a.price
+                  : parseFloat(a.price.toString().replace(/[$\s,]/g, ""));
               const priceB =
-                typeof b.price === "number" ? b.price : parseFloat(b.price);
+                typeof b.price === "number"
+                  ? b.price
+                  : parseFloat(b.price.toString().replace(/[$\s,]/g, ""));
+              console.log(
+                `Sorting: ${a.name}(${priceA}) vs ${b.name}(${priceB})`
+              );
               return priceA - priceB;
             });
             break;
           case "Price: High to Low":
             allProducts.sort((a, b) => {
+              // Handle different price formats consistently
               const priceA =
-                typeof a.price === "number" ? a.price : parseFloat(a.price);
+                typeof a.price === "number"
+                  ? a.price
+                  : parseFloat(a.price.toString().replace(/[$\s,]/g, ""));
               const priceB =
-                typeof b.price === "number" ? b.price : parseFloat(b.price);
+                typeof b.price === "number"
+                  ? b.price
+                  : parseFloat(b.price.toString().replace(/[$\s,]/g, ""));
+              console.log(
+                `Sorting: ${a.name}(${priceB}) vs ${b.name}(${priceA})`
+              );
               return priceB - priceA;
             });
             break;
@@ -425,23 +470,64 @@ const BrewAndClayUI = (function () {
     // Filter by price range - Fixed implementation with proper number parsing
     if (selectedPriceRanges.length > 0) {
       console.log("Selected price ranges:", selectedPriceRanges);
+      console.log(
+        "Products before price filtering:",
+        filteredProducts.map((p) => ({
+          name: p.name,
+          price: p.price,
+          type: typeof p.price,
+        }))
+      );
+
       filteredProducts = filteredProducts.filter((product) => {
-        const price = parseFloat(product.price);
-        console.log(`Evaluating product: ${product.name}, Price: ${price}`);
+        // Handle different price formats (string with $ or number)
+        let price;
+        if (typeof product.price === "string") {
+          // Remove currency symbol and any whitespace
+          price = parseFloat(product.price.replace(/[$\s,]/g, ""));
+          console.log(
+            `Parsed string price for ${product.name}: '${product.price}' -> ${price}`
+          );
+        } else {
+          price = parseFloat(product.price);
+          console.log(`Using numeric price for ${product.name}: ${price}`);
+        }
+
+        // Check if price is valid
         if (isNaN(price)) {
-          console.log("Invalid price - skipping product");
+          console.error(
+            `Invalid price for ${product.name}: ${
+              product.price
+            } (${typeof product.price})`
+          );
           return false;
         }
+
+        // Check if price matches any of the selected ranges
         return selectedPriceRanges.some((range) => {
+          // Normalize the range string by removing extra whitespace and newlines
+          const normalizedRange = range.replace(/\s+/g, " ").trim();
+
           let result = false;
-          if (range === "Under $25") result = price < 25;
-          if (range === "$25 - $50") result = price >= 25 && price <= 50;
-          if (range === "$50+") result = price > 50;
-          console.log(`Range: ${range}, Price: ${price}, Matches: ${result}`);
+          if (normalizedRange === "Under $25") result = price < 25;
+          if (
+            normalizedRange.includes("$25") &&
+            normalizedRange.includes("$50")
+          )
+            result = price >= 25 && price <= 50;
+          if (normalizedRange === "$50+") result = price > 50;
+
+          console.log(
+            `Range: ${range}, Normalized: ${normalizedRange}, Product: ${product.name}, Price: ${price}, Matches: ${result}`
+          );
           return result;
         });
       });
-      console.log("Filtered products after price filtering:", filteredProducts);
+
+      console.log(
+        "Filtered products after price filtering:",
+        filteredProducts.map((p) => p.name)
+      );
     }
 
     // Filter by color (assuming color information is in the product name or description)
@@ -473,14 +559,38 @@ const BrewAndClayUI = (function () {
           filteredProducts.reverse();
           break;
         case "Price: Low to High":
-          filteredProducts.sort(
-            (a, b) => parseFloat(a.price) - parseFloat(b.price)
-          );
+          filteredProducts.sort((a, b) => {
+            // Handle different price formats consistently
+            const priceA =
+              typeof a.price === "number"
+                ? a.price
+                : parseFloat(a.price.toString().replace(/[$\s,]/g, ""));
+            const priceB =
+              typeof b.price === "number"
+                ? b.price
+                : parseFloat(b.price.toString().replace(/[$\s,]/g, ""));
+            console.log(
+              `Sorting filtered: ${a.name}(${priceA}) vs ${b.name}(${priceB})`
+            );
+            return priceA - priceB;
+          });
           break;
         case "Price: High to Low":
-          filteredProducts.sort(
-            (a, b) => parseFloat(b.price) - parseFloat(a.price)
-          );
+          filteredProducts.sort((a, b) => {
+            // Handle different price formats consistently
+            const priceA =
+              typeof a.price === "number"
+                ? a.price
+                : parseFloat(a.price.toString().replace(/[$\s,]/g, ""));
+            const priceB =
+              typeof b.price === "number"
+                ? b.price
+                : parseFloat(b.price.toString().replace(/[$\s,]/g, ""));
+            console.log(
+              `Sorting filtered: ${a.name}(${priceB}) vs ${b.name}(${priceA})`
+            );
+            return priceB - priceA;
+          });
           break;
       }
     }
@@ -503,7 +613,10 @@ const BrewAndClayUI = (function () {
     );
 
     return Array.from(selectedCheckboxes).map((checkbox) => {
-      return checkbox.nextElementSibling.textContent.trim();
+      // Normalize the text content by replacing newlines and multiple spaces with a single space
+      return checkbox.nextElementSibling.textContent
+        .replace(/\s+/g, " ")
+        .trim();
     });
   };
 
@@ -527,10 +640,38 @@ const BrewAndClayUI = (function () {
           sortedProducts.reverse();
           break;
         case "Price: Low to High":
-          sortedProducts.sort((a, b) => a.price - b.price);
+          sortedProducts.sort((a, b) => {
+            // Handle different price formats consistently
+            const priceA =
+              typeof a.price === "number"
+                ? a.price
+                : parseFloat(a.price.toString().replace(/[$\s,]/g, ""));
+            const priceB =
+              typeof b.price === "number"
+                ? b.price
+                : parseFloat(b.price.toString().replace(/[$\s,]/g, ""));
+            console.log(
+              `Sorting all products: ${a.name}(${priceA}) vs ${b.name}(${priceB})`
+            );
+            return priceA - priceB;
+          });
           break;
         case "Price: High to Low":
-          sortedProducts.sort((a, b) => b.price - a.price);
+          sortedProducts.sort((a, b) => {
+            // Handle different price formats consistently
+            const priceA =
+              typeof a.price === "number"
+                ? a.price
+                : parseFloat(a.price.toString().replace(/[$\s,]/g, ""));
+            const priceB =
+              typeof b.price === "number"
+                ? b.price
+                : parseFloat(b.price.toString().replace(/[$\s,]/g, ""));
+            console.log(
+              `Sorting all products: ${a.name}(${priceB}) vs ${b.name}(${priceA})`
+            );
+            return priceB - priceA;
+          });
           break;
       }
 
