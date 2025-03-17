@@ -14,25 +14,77 @@ const BrewAndClayMobile = (function () {
     }
   };
 
-  // Create mobile menu button
+  // Create mobile menu button and cart icon for mobile
   const createMobileMenuButton = () => {
     const header = document.querySelector("header nav .flex.justify-between");
     if (!header) return;
 
+    // Create a container for mobile controls
+    const mobileControlsContainer = document.createElement("div");
+    mobileControlsContainer.className = "md:hidden flex items-center space-x-2";
+
     // Create mobile menu button
     const mobileMenuButton = document.createElement("button");
     mobileMenuButton.className =
-      "mobile-menu-button md:hidden p-2 text-gray-500 hover:text-custom";
+      "mobile-menu-button p-2 text-gray-500 hover:text-custom";
     mobileMenuButton.setAttribute("aria-label", "Toggle mobile menu");
     mobileMenuButton.innerHTML = '<i class="fas fa-bars text-xl"></i>';
 
-    // Insert button before the search input container
+    // Add menu button to container
+    mobileControlsContainer.appendChild(mobileMenuButton);
+
+    // Create mobile cart button
+    const mobileCartButton = document.createElement("button");
+    mobileCartButton.className = "p-2 text-gray-500 hover:text-custom relative";
+    mobileCartButton.setAttribute("aria-label", "View cart");
+    mobileCartButton.innerHTML = `
+      <i class="fas fa-shopping-bag"></i>
+      <span class="absolute -top-1 -right-1 bg-custom text-white text-xs rounded-full h-4 w-4 flex items-center justify-center cart-counter"></span>
+    `;
+
+    // Add cart button to container (next to hamburger menu)
+    mobileControlsContainer.appendChild(mobileCartButton);
+
+    // Add event listener to cart button
+    mobileCartButton.addEventListener("click", () => {
+      window.location.href = "Cart.html";
+    });
+
+    // Make sure the counter is also clickable and leads to cart
+    const cartCounter = mobileCartButton.querySelector(".cart-counter");
+    if (cartCounter) {
+      cartCounter.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent double triggering
+        window.location.href = "Cart.html";
+      });
+    }
+
+    // Insert container before the search input container
     const searchContainer = header.querySelector(
       ".flex.items-center:last-child"
     );
     if (searchContainer) {
-      searchContainer.prepend(mobileMenuButton);
+      searchContainer.prepend(mobileControlsContainer);
     }
+
+    // Update the cart counter in the UI
+    const updateCartCounter = () => {
+      // Select all cart counter spans inside shopping bag buttons
+      const cartCounters = document.querySelectorAll(
+        ".fas.fa-shopping-bag + span, .cart-counter"
+      );
+      if (cartCounters.length > 0) {
+        const itemCount = cart.reduce(
+          (total, item) => total + item.quantity,
+          0
+        );
+        cartCounters.forEach((counter) => {
+          counter.textContent = itemCount;
+          // Only display the counter if there are items in the cart
+          counter.style.display = itemCount > 0 ? "flex" : "none";
+        });
+      }
+    };
   };
 
   // Create mobile menu
@@ -68,24 +120,27 @@ const BrewAndClayMobile = (function () {
       mobileMenu.appendChild(mobileNavLinks);
     }
 
-    // Add icons section (cart, user, etc.)
+    // Add icons section (user, heart, etc. - NO CART)
     const iconSection = document.createElement("div");
     iconSection.className =
       "border-t border-gray-200 py-3 px-4 flex justify-around";
 
-    // Clone icon buttons
+    // Clone icon buttons (excluding shopping bag for mobile)
     const iconButtons = document.querySelector(
       ".hidden.md\\:ml-4.md\\:flex.md\\:items-center.md\\:space-x-4"
     );
     if (iconButtons) {
       const buttons = iconButtons.querySelectorAll("button");
       buttons.forEach((button) => {
-        const mobileButton = button.cloneNode(true);
-        mobileButton.className = "p-2 text-gray-500 hover:text-custom";
-        iconSection.appendChild(mobileButton);
+        // Skip the shopping bag button as we've added it to the header
+        if (!button.querySelector(".fa-shopping-bag")) {
+          const mobileButton = button.cloneNode(true);
+          mobileButton.className = "p-2 text-gray-500 hover:text-custom";
+          iconSection.appendChild(mobileButton);
+        }
       });
     } else {
-      // Create default buttons if none exist
+      // Create default buttons if none exist (excluding shopping bag)
       iconSection.innerHTML = `
         <button class="p-2 text-gray-500 hover:text-custom">
           <i class="far fa-heart"></i>
@@ -93,13 +148,8 @@ const BrewAndClayMobile = (function () {
         <button class="p-2 text-gray-500 hover:text-custom">
           <i class="far fa-user"></i>
         </button>
-        <button class="p-2 text-gray-500 hover:text-custom relative">
-          <i class="fas fa-shopping-bag"></i>
-          <span class="absolute -top-1 -right-1 bg-custom text-white text-xs rounded-full h-4 w-4 flex items-center justify-center"></span>
-        </button>
       `;
     }
-
     mobileMenu.appendChild(iconSection);
 
     // Add search bar for mobile
@@ -143,11 +193,7 @@ const BrewAndClayMobile = (function () {
       // Setup mobile menu button clicks
       const mobileButtons = mobileMenu.querySelectorAll("button");
       mobileButtons.forEach((button) => {
-        if (button.querySelector(".fa-shopping-bag")) {
-          button.addEventListener("click", () => {
-            window.location.href = "Cart.html";
-          });
-        } else if (button.querySelector(".fa-user")) {
+        if (button.querySelector(".fa-user")) {
           button.addEventListener("click", () => {
             window.location.href = "SignUp.html";
           });
@@ -218,6 +264,29 @@ const BrewAndClayMobile = (function () {
     init: function () {
       initMobileNavigation();
       adjustForMobile();
+
+      // Update cart counter on initialization
+      // This ensures the cart counter is properly displayed when the page loads
+      const cartCounters = document.querySelectorAll(".cart-counter");
+      if (cartCounters.length > 0) {
+        // Get cart from session storage
+        const savedCart = sessionStorage.getItem("brewAndClayCart");
+        if (savedCart) {
+          try {
+            const cart = JSON.parse(savedCart);
+            const itemCount = cart.reduce(
+              (total, item) => total + item.quantity,
+              0
+            );
+            cartCounters.forEach((counter) => {
+              counter.textContent = itemCount;
+              counter.style.display = itemCount > 0 ? "flex" : "none";
+            });
+          } catch (e) {
+            console.error("Error parsing cart from session storage:", e);
+          }
+        }
+      }
 
       // Handle window resize
       window.addEventListener("resize", function () {

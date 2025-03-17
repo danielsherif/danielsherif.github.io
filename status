@@ -4,12 +4,11 @@
 ✔️ Integrate MailJS
 ✔️ Send email to receipient
 ✔️ Filter by category/color
-
+✔️ Mobile
 
 What needs to be done?
   
-⟢ Mobile
-⟢ Implement a search bar to allow users to search for 
+⟢ Search bar missing in mobile
 ⟢ Fliter by price
 ⟢ Implement login/signup
 ⟢ Fix header showing wrong page
@@ -21,5 +20,6 @@ What needs to be done?
 ⟢ Products and description and quantity
 ⟢ Page number
 ⟢ SSL
-⟢ Implement app to easily modify and update products
+⟢ Implement app to easily modify and update 
+
 
