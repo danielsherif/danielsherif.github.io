@@ -75,6 +75,13 @@ const BrewAndClayUI = (function () {
         } else if (index === 2) {
           link.href = pages.shop + "?view=collections";
           link.textContent = "Collections";
+          // Check if we're on the collections view
+          const urlParams = new URLSearchParams(window.location.search);
+          const collectionView = urlParams.get("view") === "collections";
+          if (currentPage === pages.shop && collectionView) {
+            link.classList.remove("text-gray-500");
+            link.classList.add("text-custom", "border-custom", "border-b-2");
+          }
         } else if (index === 3) {
           link.href = pages.about;
           link.textContent = "About";
