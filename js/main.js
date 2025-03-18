@@ -135,7 +135,7 @@ const BrewAndClay = (function () {
           price: parseFloat(
             productCard
               .querySelector(".product-price")
-              .textContent.replace("$", "")
+              .textContent.replace("EGP ", "")
           ),
           image: productCard.querySelector(".product-image").src,
         };

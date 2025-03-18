@@ -28,7 +28,7 @@ const BrewAndClayEmail = (function () {
 
     // Add each item with quantity and price
     cartItems.forEach((item) => {
-      messageText += `${item.name} x${item.quantity} - $${(
+      messageText += `${item.name} x${item.quantity} - EGP ${(
         item.price * item.quantity
       ).toFixed(2)}\n`;
     });
@@ -39,13 +39,13 @@ const BrewAndClayEmail = (function () {
     }, 0);
 
     // Add shipping cost
-    const shipping = 65.0; // Fixed shipping cost
+    const shipping = 2015.0; // Fixed shipping cost in EGP
 
     // Add subtotal, shipping, and total to the message
     messageText += "\n";
-    messageText += `Subtotal: $${subtotal.toFixed(2)}\n`;
-    messageText += `Shipping: $${shipping.toFixed(2)}\n`;
-    messageText += `Total (including delivery): $${(
+    messageText += `Subtotal: EGP ${subtotal.toFixed(2)}\n`;
+    messageText += `Shipping: EGP ${shipping.toFixed(2)}\n`;
+    messageText += `Total (including delivery): EGP ${(
       subtotal + shipping
     ).toFixed(2)}\n`;
 

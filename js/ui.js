@@ -377,10 +377,10 @@ const BrewAndClayUI = (function () {
 
                 return selectedPriceRanges.some((range) => {
                   let result = false;
-                  if (range === "Under $25") result = price < 25;
-                  if (range === "$25 - $50")
-                    result = price >= 25 && price <= 50;
-                  if (range === "$50+") result = price > 50;
+                  if (range === "Under EGP 775") result = price < 775;
+                  if (range === "EGP 775 - EGP 1550")
+                    result = price >= 775 && price <= 1550;
+                  if (range === "EGP 1550+") result = price > 1550;
                   console.log(
                     `Range: ${range}, Product: ${product.name}, Price: ${price}, Matches: ${result}`
                   );
@@ -522,13 +522,13 @@ const BrewAndClayUI = (function () {
           const normalizedRange = range.replace(/\s+/g, " ").trim();
 
           let result = false;
-          if (normalizedRange === "Under $25") result = price < 25;
+          if (normalizedRange === "Under EGP 775") result = price < 775;
           if (
-            normalizedRange.includes("$25") &&
-            normalizedRange.includes("$50")
+            normalizedRange.includes("EGP 775") &&
+            normalizedRange.includes("EGP 1550")
           )
-            result = price >= 25 && price <= 50;
-          if (normalizedRange === "$50+") result = price > 50;
+            result = price >= 775 && price <= 1550;
+          if (normalizedRange === "EGP 1550+") result = price > 1550;
 
           console.log(
             `Range: ${range}, Normalized: ${normalizedRange}, Product: ${product.name}, Price: ${price}, Matches: ${result}`
@@ -848,7 +848,7 @@ const BrewAndClayUI = (function () {
                         <h3 class="text-lg font-medium text-gray-900 product-name">${
                           product.name
                         }</h3>
-                        <p class="mt-2 text-sm text-gray-500 product-price">$${product.price.toFixed(
+                        <p class="mt-2 text-sm text-gray-500 product-price">EGP ${product.price.toFixed(
                           2
                         )}</p>
                         <button class="!rounded-button mt-4 w-full bg-custom text-white py-2 px-4 hover:bg-custom/90 add-to-cart-btn">Add to Cart</button>
@@ -1027,7 +1027,7 @@ const BrewAndClayUI = (function () {
     // Update product price
     const productPrice = document.querySelector(".product-price");
     if (productPrice) {
-      productPrice.textContent = `$${product.price.toFixed(2)}`;
+      productPrice.textContent = `EGP ${product.price.toFixed(2)}`;
     }
 
     // Update product description
@@ -1094,8 +1094,8 @@ const BrewAndClayUI = (function () {
         `;
 
         // Update totals
-        if (subtotalElement) subtotalElement.textContent = "$0.00";
-        if (totalElement) totalElement.textContent = "$0.00";
+        if (subtotalElement) subtotalElement.textContent = "EGP 0.00";
+        if (totalElement) totalElement.textContent = "EGP 0.00";
       } else {
         // Create a document fragment to improve performance
         const fragment = document.createDocumentFragment();
@@ -1117,7 +1117,7 @@ const BrewAndClayUI = (function () {
               </div>
             </div>
             <div class="flex items-center space-x-4">
-              <span class="font-medium text-custom">$${(
+              <span class="font-medium text-custom">EGP ${(
                 item.price * item.quantity
               ).toFixed(2)}</span>
               <button class="text-gray-400 hover:text-red-500 remove-item-btn">
@@ -1146,14 +1146,14 @@ const BrewAndClayUI = (function () {
 
         // Update subtotal
         if (subtotalElement) {
-          subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+          subtotalElement.textContent = `EGP ${subtotal.toFixed(2)}`;
         } else {
           // Try a more specific selector if the first one didn't work
           const altSubtotalElement = document.querySelector(
             ".space-y-2.pb-4.border-b .flex.justify-between:first-child .font-medium"
           );
           if (altSubtotalElement) {
-            altSubtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+            altSubtotalElement.textContent = `EGP ${subtotal.toFixed(2)}`;
           }
         }
 
@@ -1161,15 +1161,15 @@ const BrewAndClayUI = (function () {
         const shippingElement = document.querySelector(
           ".flex.justify-between:nth-child(2) .font-medium.text-gray-900"
         );
-        let shipping = 65.0; // Fixed shipping cost of $65.00
+        let shipping = 65.0; // Fixed shipping cost of EGP 65.00
         if (shippingElement) {
-          shippingElement.textContent = `$${shipping.toFixed(2)}`;
+          shippingElement.textContent = `EGP ${shipping.toFixed(2)}`;
         }
         const total = subtotal + shipping;
 
         // Update total
         if (totalElement) {
-          totalElement.textContent = `$${total.toFixed(2)}`;
+          totalElement.textContent = `EGP ${total.toFixed(2)}`;
         }
 
         // Update order summary to match checkout page format
@@ -1189,7 +1189,7 @@ const BrewAndClayUI = (function () {
                 <span class="font-medium">${item.name}</span>
                 <span class="text-gray-500 ml-2">x${item.quantity}</span>
               </div>
-              <span>$${(item.price * item.quantity).toFixed(2)}</span>
+              <span>EGP ${(item.price * item.quantity).toFixed(2)}</span>
             `;
             orderFragment.appendChild(orderItemElement);
           });
@@ -1200,13 +1200,13 @@ const BrewAndClayUI = (function () {
           // Add back the subtotal and shipping rows
           const subtotalRow = document.createElement("div");
           subtotalRow.className = "flex justify-between";
-          subtotalRow.innerHTML = `<span class="text-gray-600">Subtotal</span><span class="font-medium text-gray-900">$${subtotal.toFixed(
+          subtotalRow.innerHTML = `<span class="text-gray-600">Subtotal</span><span class="font-medium text-gray-900">EGP ${subtotal.toFixed(
             2
           )}</span>`;
 
           const shippingRow = document.createElement("div");
           shippingRow.className = "flex justify-between";
-          shippingRow.innerHTML = `<span class="text-gray-600">Shipping (6-7 days)</span><span class="font-medium text-gray-900">$${shipping.toFixed(
+          shippingRow.innerHTML = `<span class="text-gray-600">Shipping (6-7 days)</span><span class="font-medium text-gray-900">EGP ${shipping.toFixed(
             2
           )}</span>`;
 
@@ -1264,7 +1264,7 @@ const BrewAndClayUI = (function () {
             <span class="font-medium">${item.name}</span>
             <span class="text-gray-500 ml-2">x${item.quantity}</span>
           </div>
-          <span>$${(item.price * item.quantity).toFixed(2)}</span>
+          <span>EGP ${(item.price * item.quantity).toFixed(2)}</span>
         `;
         fragment.appendChild(orderItemElement);
       });
@@ -1275,13 +1275,13 @@ const BrewAndClayUI = (function () {
       // Add the subtotal and shipping rows
       const subtotalRow = document.createElement("div");
       subtotalRow.className = "flex justify-between";
-      subtotalRow.innerHTML = `<span class="text-gray-600">Subtotal</span><span class="font-medium text-gray-900">$${subtotal.toFixed(
+      subtotalRow.innerHTML = `<span class="text-gray-600">Subtotal</span><span class="font-medium text-gray-900">EGP ${subtotal.toFixed(
         2
       )}</span>`;
 
       const shippingRow = document.createElement("div");
       shippingRow.className = "flex justify-between";
-      shippingRow.innerHTML = `<span class="text-gray-600">Shipping (6-7 days)</span><span class="font-medium text-gray-900">$${shipping.toFixed(
+      shippingRow.innerHTML = `<span class="text-gray-600">Shipping (6-7 days)</span><span class="font-medium text-gray-900">EGP ${shipping.toFixed(
         2
       )}</span>`;
 
@@ -1291,7 +1291,7 @@ const BrewAndClayUI = (function () {
 
     // Update total
     if (totalElement) {
-      totalElement.textContent = `$${total.toFixed(2)}`;
+      totalElement.textContent = `EGP ${total.toFixed(2)}`;
     }
 
     // Handle checkout form submission

@@ -8,19 +8,18 @@
 ✔️ Fliter by price
 ✔️ Fixed collections page
 ✔️ Sort
+✔️ Paging
+✔️ SSL
+✔️ Currency
 
 
 What needs to be done?
   
 ⟢ Implement login/signup
-⟢ Fix header showing wrong page
 ⟢ Add animations
 ⟢ Fix routing
 ⟢ Product statue
-⟢ Currency
 ⟢ Products and description and quantity
-⟢ Page number
-⟢ SSL
 ⟢ Implement app to easily modify and update 
 
 
