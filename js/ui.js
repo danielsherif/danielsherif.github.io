@@ -254,6 +254,15 @@ const BrewAndClayUI = (function () {
     const searchQuery = urlParams.get("search");
     const categoryFilter = urlParams.get("category");
     const collectionView = urlParams.get("view") === "collections";
+    const sortValue = urlParams.get("sort");
+
+    // Set sort dropdown value if it exists in URL
+    if (sortValue) {
+      const sortSelect = document.getElementById("product-sort");
+      if (sortSelect) {
+        sortSelect.value = sortValue;
+      }
+    }
 
     if (searchQuery) {
       // Handle search results
@@ -749,11 +758,16 @@ const BrewAndClayUI = (function () {
     }
   };
 
-  // Render product grid
+  // Render product grid with pagination
   const renderProductGrid = (products) => {
     const productsContainer = document.querySelector(
       ".grid.grid-cols-1.md\\:grid-cols-3.gap-8"
     );
+
+    // Get pagination container
+    const paginationContainer = document.querySelector(
+      'nav[aria-label="Pagination"]'
+    )?.parentElement;
 
     // Show message if no products match the filters
     if (products.length === 0) {
@@ -765,6 +779,11 @@ const BrewAndClayUI = (function () {
           </button>
         </div>
       `;
+
+      // Hide pagination if no products
+      if (paginationContainer) {
+        paginationContainer.style.display = "none";
+      }
 
       // Add event listener to clear filters button
       const clearFiltersBtn =
@@ -787,14 +806,34 @@ const BrewAndClayUI = (function () {
     }
 
     if (productsContainer) {
+      // Pagination settings
+      const productsPerPage = 12;
+      const totalPages = Math.ceil(products.length / productsPerPage);
+
+      // Get current page from URL or default to 1
+      const urlParams = new URLSearchParams(window.location.search);
+      let currentPage = parseInt(urlParams.get("page")) || 1;
+
+      // Ensure current page is valid
+      if (currentPage < 1 || currentPage > totalPages) {
+        currentPage = 1;
+      }
+
+      // Calculate start and end indices for current page
+      const startIndex = (currentPage - 1) * productsPerPage;
+      const endIndex = Math.min(startIndex + productsPerPage, products.length);
+
+      // Get products for current page
+      const currentPageProducts = products.slice(startIndex, endIndex);
+
       // Clear existing content
       productsContainer.innerHTML = "";
 
       // Create a document fragment to improve performance
       const fragment = document.createDocumentFragment();
 
-      // Render products
-      products.forEach((product) => {
+      // Render products for current page
+      currentPageProducts.forEach((product) => {
         const productCard = document.createElement("div");
         productCard.className =
           "group relative rounded-lg overflow-hidden bg-white shadow-lg hover:shadow-xl transition-shadow product-card";
@@ -839,7 +878,114 @@ const BrewAndClayUI = (function () {
 
       // Append all products at once
       productsContainer.appendChild(fragment);
+
+      // Update pagination
+      updatePagination(currentPage, totalPages);
     }
+  };
+
+  // Update pagination controls
+  const updatePagination = (currentPage, totalPages) => {
+    const paginationContainer = document.querySelector(
+      'nav[aria-label="Pagination"]'
+    )?.parentElement;
+
+    if (!paginationContainer) return;
+
+    // Hide pagination if only one page or less
+    if (totalPages <= 1) {
+      paginationContainer.style.display = "none";
+      return;
+    }
+
+    // Show pagination if more than one page
+    paginationContainer.style.display = "flex";
+
+    // Get the pagination nav element
+    const paginationNav = paginationContainer.querySelector("nav");
+    if (!paginationNav) return;
+
+    // Clear existing pagination
+    paginationNav.innerHTML = "";
+
+    // Create previous button
+    const prevButton = document.createElement("a");
+    prevButton.href = "#";
+    prevButton.className =
+      "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium " +
+      (currentPage === 1
+        ? "text-gray-300 cursor-not-allowed"
+        : "text-gray-500 hover:bg-gray-50");
+    prevButton.innerHTML =
+      '<span class="sr-only">Previous</span><i class="fas fa-chevron-left"></i>';
+
+    if (currentPage > 1) {
+      prevButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        navigateToPage(currentPage - 1);
+      });
+    }
+
+    paginationNav.appendChild(prevButton);
+
+    // Create page number buttons
+    for (let i = 1; i <= totalPages; i++) {
+      const pageButton = document.createElement("a");
+      pageButton.href = "#";
+      pageButton.className =
+        "relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium " +
+        (i === currentPage ? "text-custom" : "text-gray-700 hover:bg-gray-50");
+      pageButton.textContent = i.toString();
+
+      pageButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        navigateToPage(i);
+      });
+
+      paginationNav.appendChild(pageButton);
+    }
+
+    // Create next button
+    const nextButton = document.createElement("a");
+    nextButton.href = "#";
+    nextButton.className =
+      "relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium " +
+      (currentPage === totalPages
+        ? "text-gray-300 cursor-not-allowed"
+        : "text-gray-500 hover:bg-gray-50");
+    nextButton.innerHTML =
+      '<span class="sr-only">Next</span><i class="fas fa-chevron-right"></i>';
+
+    if (currentPage < totalPages) {
+      nextButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        navigateToPage(currentPage + 1);
+      });
+    }
+
+    paginationNav.appendChild(nextButton);
+  };
+
+  // Navigate to a specific page
+  const navigateToPage = (pageNumber) => {
+    // Get current URL and parameters
+    const url = new URL(window.location.href);
+    const params = new URLSearchParams(url.search);
+
+    // Update or add page parameter
+    params.set("page", pageNumber.toString());
+
+    // Preserve sort parameter if it exists
+    const sortSelect = document.getElementById("product-sort");
+    if (sortSelect && sortSelect.value !== "Featured") {
+      params.set("sort", sortSelect.value);
+    }
+
+    // Update URL with new parameters
+    url.search = params.toString();
+
+    // Navigate to the new URL
+    window.location.href = url.toString();
   };
 
   // Product page initialization
