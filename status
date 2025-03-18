@@ -6,16 +6,17 @@
 ✔️ Filter by category/color
 ✔️ Mobile
 ✔️ Fliter by price
+✔️ Fixed collections page
+
 
 What needs to be done?
   
-⟢ Search bar missing in mobile
+
 ⟢ Sort
 ⟢ Implement login/signup
 ⟢ Fix header showing wrong page
 ⟢ Add animations
 ⟢ Fix routing
-⟢ Fix wrong pages in header
 ⟢ Product statue
 ⟢ Currency
 ⟢ Products and description and quantity
@@ -24,3 +25,12 @@ What needs to be done?
 ⟢ Implement app to easily modify and update 
 
 
+
+
+Bugs
+-Cart starts on 3 on shop and collection page but not home
+-Search bar missing in mobile
+
+
+Improvements
+-Making filter in mobile a button instead of always on display

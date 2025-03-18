@@ -307,146 +307,148 @@ const BrewAndClayUI = (function () {
     }
 
     // Initialize sorting functionality
-    initSorting();
-  };
+    const initSorting = () => {
+      const sortSelect = document.getElementById("product-sort");
 
-  // Initialize sorting functionality
-  const initSorting = () => {
-    const sortSelect = document.querySelector(
-      ".rounded-button.border-gray-300.text-gray-700"
-    );
+      if (sortSelect) {
+        sortSelect.addEventListener("change", () => {
+          console.log("Sort dropdown changed to:", sortSelect.value);
+          const selectedOption = sortSelect.value;
+          const products = document.querySelectorAll(".product-card");
+          const productsArray = Array.from(products);
 
-    if (sortSelect) {
-      sortSelect.addEventListener("change", () => {
-        const selectedOption = sortSelect.value;
-        const products = document.querySelectorAll(".product-card");
-        const productsArray = Array.from(products);
+          // Get all products to sort
+          let allProducts = BrewAndClayDB.getAllProducts();
 
-        // Get all products to sort
-        let allProducts = BrewAndClayDB.getAllProducts();
+          // Check if we have filtered products
+          const selectedCollections = getSelectedFilters("Collections");
+          const selectedPriceRanges = getSelectedFilters("Price Range");
+          const selectedColors = getSelectedFilters("Color");
 
-        // Check if we have filtered products
-        const selectedCollections = getSelectedFilters("Collections");
-        const selectedPriceRanges = getSelectedFilters("Price Range");
-        const selectedColors = getSelectedFilters("Color");
+          // Apply filters if any are selected
+          if (
+            selectedCollections.length > 0 ||
+            selectedPriceRanges.length > 0 ||
+            selectedColors.length > 0
+          ) {
+            // Apply the same filtering logic as in applyProductFilters
+            if (selectedCollections.length > 0) {
+              allProducts = allProducts.filter((product) =>
+                selectedCollections.includes(product.category)
+              );
+            }
 
-        // Apply filters if any are selected
-        if (
-          selectedCollections.length > 0 ||
-          selectedPriceRanges.length > 0 ||
-          selectedColors.length > 0
-        ) {
-          // Apply the same filtering logic as in applyProductFilters
-          if (selectedCollections.length > 0) {
-            allProducts = allProducts.filter((product) =>
-              selectedCollections.includes(product.category)
-            );
-          }
+            if (selectedPriceRanges.length > 0) {
+              console.log("Selected price ranges (sort):", selectedPriceRanges);
+              allProducts = allProducts.filter((product) => {
+                // Handle different price formats (string with $ or number)
+                let price;
+                if (typeof product.price === "string") {
+                  // Remove currency symbol and any whitespace
+                  price = parseFloat(product.price.replace(/[$\s,]/g, ""));
+                  console.log(
+                    `Parsed string price for ${product.name}: '${product.price}' -> ${price}`
+                  );
+                } else {
+                  price = parseFloat(product.price);
+                  console.log(
+                    `Using numeric price for ${product.name}: ${price}`
+                  );
+                }
 
-          if (selectedPriceRanges.length > 0) {
-            console.log("Selected price ranges (sort):", selectedPriceRanges);
-            allProducts = allProducts.filter((product) => {
-              // Handle different price formats (string with $ or number)
-              let price;
-              if (typeof product.price === "string") {
-                // Remove currency symbol and any whitespace
-                price = parseFloat(product.price.replace(/[$\s,]/g, ""));
-                console.log(
-                  `Parsed string price for ${product.name}: '${product.price}' -> ${price}`
-                );
-              } else {
-                price = parseFloat(product.price);
-                console.log(
-                  `Using numeric price for ${product.name}: ${price}`
-                );
-              }
+                // Check if price is valid
+                if (isNaN(price)) {
+                  console.error(
+                    `Invalid price for ${product.name}: ${
+                      product.price
+                    } (${typeof product.price})`
+                  );
+                  return false;
+                }
 
-              // Check if price is valid
-              if (isNaN(price)) {
-                console.error(
-                  `Invalid price for ${product.name}: ${
-                    product.price
-                  } (${typeof product.price})`
-                );
-                return false;
-              }
-
-              return selectedPriceRanges.some((range) => {
-                let result = false;
-                if (range === "Under $25") result = price < 25;
-                if (range === "$25 - $50") result = price >= 25 && price <= 50;
-                if (range === "$50+") result = price > 50;
-                console.log(
-                  `Range: ${range}, Product: ${product.name}, Price: ${price}, Matches: ${result}`
-                );
-                return result;
+                return selectedPriceRanges.some((range) => {
+                  let result = false;
+                  if (range === "Under $25") result = price < 25;
+                  if (range === "$25 - $50")
+                    result = price >= 25 && price <= 50;
+                  if (range === "$50+") result = price > 50;
+                  console.log(
+                    `Range: ${range}, Product: ${product.name}, Price: ${price}, Matches: ${result}`
+                  );
+                  return result;
+                });
               });
-            });
+            }
+
+            if (selectedColors.length > 0) {
+              allProducts = allProducts.filter((product) => {
+                const productText = (
+                  product.name +
+                  " " +
+                  product.description
+                ).toLowerCase();
+                return selectedColors.some((color) =>
+                  productText.includes(color.toLowerCase())
+                );
+              });
+            }
           }
 
-          if (selectedColors.length > 0) {
-            allProducts = allProducts.filter((product) => {
-              const productText = (
-                product.name +
-                " " +
-                product.description
-              ).toLowerCase();
-              return selectedColors.some((color) =>
-                productText.includes(color.toLowerCase())
-              );
-            });
+          // Sort products based on selected option
+          console.log("Sorting products by:", selectedOption);
+          switch (selectedOption) {
+            case "Featured":
+              // No sorting needed, products are already in featured order
+              break;
+            case "Newest":
+              // For demo purposes, we'll just reverse the order
+              allProducts.reverse();
+              break;
+            case "Price: Low to High":
+              allProducts.sort((a, b) => {
+                // Handle different price formats consistently
+                const priceA =
+                  typeof a.price === "number"
+                    ? a.price
+                    : parseFloat(a.price.toString().replace(/[$\s,]/g, ""));
+                const priceB =
+                  typeof b.price === "number"
+                    ? b.price
+                    : parseFloat(b.price.toString().replace(/[$\s,]/g, ""));
+                console.log(
+                  `Sorting: ${a.name}(${priceA}) vs ${b.name}(${priceB})`
+                );
+                return priceA - priceB;
+              });
+              break;
+            case "Price: High to Low":
+              allProducts.sort((a, b) => {
+                // Handle different price formats consistently
+                const priceA =
+                  typeof a.price === "number"
+                    ? a.price
+                    : parseFloat(a.price.toString().replace(/[$\s,]/g, ""));
+                const priceB =
+                  typeof b.price === "number"
+                    ? b.price
+                    : parseFloat(b.price.toString().replace(/[$\s,]/g, ""));
+                console.log(
+                  `Sorting: ${a.name}(${priceB}) vs ${b.name}(${priceA})`
+                );
+                return priceB - priceA;
+              });
+              break;
           }
-        }
 
-        // Sort products based on selected option
-        switch (selectedOption) {
-          case "Featured":
-            // No sorting needed, products are already in featured order
-            break;
-          case "Newest":
-            // For demo purposes, we'll just reverse the order
-            allProducts.reverse();
-            break;
-          case "Price: Low to High":
-            allProducts.sort((a, b) => {
-              // Handle different price formats consistently
-              const priceA =
-                typeof a.price === "number"
-                  ? a.price
-                  : parseFloat(a.price.toString().replace(/[$\s,]/g, ""));
-              const priceB =
-                typeof b.price === "number"
-                  ? b.price
-                  : parseFloat(b.price.toString().replace(/[$\s,]/g, ""));
-              console.log(
-                `Sorting: ${a.name}(${priceA}) vs ${b.name}(${priceB})`
-              );
-              return priceA - priceB;
-            });
-            break;
-          case "Price: High to Low":
-            allProducts.sort((a, b) => {
-              // Handle different price formats consistently
-              const priceA =
-                typeof a.price === "number"
-                  ? a.price
-                  : parseFloat(a.price.toString().replace(/[$\s,]/g, ""));
-              const priceB =
-                typeof b.price === "number"
-                  ? b.price
-                  : parseFloat(b.price.toString().replace(/[$\s,]/g, ""));
-              console.log(
-                `Sorting: ${a.name}(${priceB}) vs ${b.name}(${priceA})`
-              );
-              return priceB - priceA;
-            });
-            break;
-        }
+          // Render the sorted products
+          console.log("Rendering sorted products:", allProducts);
+          renderProductGrid(allProducts);
+        });
+      }
+    };
 
-        // Render the sorted products
-        renderProductGrid(allProducts);
-      });
-    }
+    // Initialize sorting
+    initSorting();
   };
 
   // Apply product filters
@@ -547,9 +549,7 @@ const BrewAndClayUI = (function () {
     }
 
     // Apply current sorting if any
-    const sortSelect = document.querySelector(
-      ".rounded-button.border-gray-300.text-gray-700"
-    );
+    const sortSelect = document.getElementById("product-sort");
 
     if (sortSelect && sortSelect.value !== "Featured") {
       const selectedOption = sortSelect.value;
@@ -627,9 +627,7 @@ const BrewAndClayUI = (function () {
     const products = BrewAndClayDB.getAllProducts();
 
     // Apply current sorting if any
-    const sortSelect = document.querySelector(
-      ".rounded-button.border-gray-300.text-gray-700"
-    );
+    const sortSelect = document.getElementById("product-sort");
 
     if (sortSelect && sortSelect.value !== "Featured") {
       const selectedOption = sortSelect.value;
