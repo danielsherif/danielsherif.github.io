@@ -11,11 +11,13 @@
 ✔️ Paging
 ✔️ SSL
 ✔️ Currency
-
+✔️ Basic Login / Signup
+✔️ MongoDB
 
 What needs to be done?
   
-⟢ Implement login/signup
+⟢ Make the login and sign up actually do something and link carts 
+⟢ Wishlist and link to DB
 ⟢ Add animations
 ⟢ Fix routing
 ⟢ Product statue

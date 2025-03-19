@@ -26,13 +26,13 @@
                         <img class="h-8 w-auto" src="../Material/TextAndEmblem.png" alt="Brew and Clay" />
                     </a>
                     <div class="hidden md:ml-6 md:flex md:space-x-8">
-                        <a href="#"
+                        <a href="Home.html"
                             class="text-gray-500 hover:text-custom px-1 inline-flex items-center h-full text-sm font-medium">Home</a>
-                        <a href="#"
+                        <a href="AllProducts.html"
                             class="text-gray-500 hover:text-custom px-1 inline-flex items-center h-full text-sm font-medium">Shop</a>
                         <a href="Collections.html"
                             class="text-gray-500 hover:text-custom px-1 inline-flex items-center h-full text-sm font-medium">Collections</a>
-                        <a href="#"
+                        <a href="AboutUs.html"
                             class="text-gray-500 hover:text-custom px-1 inline-flex items-center h-full text-sm font-medium">About</a>
                     </div>
                 </div>
@@ -72,30 +72,61 @@
                     <h2 class="text-4xl font-bold text-gray-900 mb-2">Create an Account</h2>
                     <p class="text-gray-600">Join Brew and Clay to start your artisan journey</p>
                 </div>
-                <form class="mt-8 space-y-6">
+                <form id="signup-form" class="mt-8 space-y-6">
                     <div class="space-y-4 rounded-md">
-                        <div><label for="name" class="sr-only">Full Name</label><input id="name" name="name" type="text"
-                                required=""
+                        <div class="relative">
+                            <label for="name" class="sr-only">Full Name</label>
+                            <input id="name" name="name" type="text" required
                                 class="appearance-none rounded-button relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-custom focus:border-custom"
-                                placeholder="Full Name" /></div>
-                        <div><label for="email" class="sr-only">Email address</label><input id="email" name="email"
-                                type="email" required=""
+                                placeholder="Full Name" />
+                            <p class="text-xs text-gray-500 mt-1 ml-1">Your full name</p>
+                            <p id="name-error" class="text-xs text-red-500 mt-1 ml-1 hidden">Name is required</p>
+                        </div>
+                        <div class="relative">
+                            <label for="email" class="sr-only">Email address</label>
+                            <input id="email" name="email" type="email" required
                                 class="appearance-none rounded-button relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-custom focus:border-custom"
-                                placeholder="Email address" /></div>
-                        <div><label for="password" class="sr-only">Password</label><input id="password" name="password"
-                                type="password" required=""
+                                placeholder="Email address" />
+                            <p class="text-xs text-gray-500 mt-1 ml-1">Example: yourmail@mail.com</p>
+                            <p id="email-error" class="text-xs text-red-500 mt-1 ml-1 hidden">Please enter a valid email
+                                address</p>
+                        </div>
+                        <div class="relative">
+                            <label for="phone" class="sr-only">Phone Number</label>
+                            <input id="phone" name="phone" type="tel" required
                                 class="appearance-none rounded-button relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-custom focus:border-custom"
-                                placeholder="Password" /></div>
-                        <div><label for="confirm-password" class="sr-only">Confirm Password</label><input
-                                id="confirm-password" name="confirm-password" type="password" required=""
+                                placeholder="Phone Number" />
+                            <p class="text-xs text-gray-500 mt-1 ml-1">Format: 01XXXXXXXXX</p>
+                            <p id="phone-error" class="text-xs text-red-500 mt-1 ml-1 hidden">Phone number must be in
+                                format 01XXXXXXXXX</p>
+                        </div>
+                        <div class="relative">
+                            <label for="password" class="sr-only">Password</label>
+                            <input id="password" name="password" type="password" required
                                 class="appearance-none rounded-button relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-custom focus:border-custom"
-                                placeholder="Confirm Password" /></div>
+                                placeholder="Password" />
+                            <p class="text-xs text-gray-500 mt-1 ml-1">Must be at least 8 characters</p>
+                            <p id="password-error" class="text-xs text-red-500 mt-1 ml-1 hidden">Password must be at
+                                least 8 characters</p>
+                        </div>
+                        <div class="relative">
+                            <label for="confirm-password" class="sr-only">Confirm Password</label>
+                            <input id="confirm-password" name="confirm-password" type="password" required
+                                class="appearance-none rounded-button relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-custom focus:border-custom"
+                                placeholder="Confirm Password" />
+                            <p class="text-xs text-gray-500 mt-1 ml-1">Re-enter your password</p>
+                            <p id="confirm-password-error" class="text-xs text-red-500 mt-1 ml-1 hidden">Passwords do
+                                not match</p>
+                        </div>
                     </div>
-                    <div><button type="submit"
-                            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-button text-white bg-custom hover:bg-custom/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom">Sign
-                            up</button></div>
+                    <div>
+                        <button type="submit"
+                            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-button text-white bg-custom hover:bg-custom/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom">
+                            Sign up
+                        </button>
+                    </div>
                     <div class="text-center">
-                        <p class="text-sm text-gray-600">Already have an account? <a href="#"
+                        <p class="text-sm text-gray-600">Already have an account? <a href="Login.html"
                                 class="font-medium text-custom hover:text-custom/90">Sign in</a></p>
                     </div>
                 </form>
@@ -152,6 +183,7 @@
     <script src="../js/main.js"></script>
     <script src="../js/ui.js"></script>
     <script src="../js/mobile.js"></script>
+    <script src="../js/signup.js"></script>
 
     <script>
         new Glide('.glide', {
