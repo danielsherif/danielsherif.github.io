@@ -161,13 +161,16 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Request method: POST");
         console.log("Request headers: Content-Type: application/json");
 
-        const response = await fetch("/api/users/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
-        });
+        const response = await fetch(
+          "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api/users/register",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestData),
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

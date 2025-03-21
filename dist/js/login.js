@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("Login form submission started");
     console.log("Current URL:", window.location.href);
+    console.log("API endpoint being called: /api/users/login");
 
     // Validate all fields
     const isEmailValid = showError(
@@ -68,18 +69,50 @@ document.addEventListener("DOMContentLoaded", function () {
     // If all validations pass
     if (isEmailValid && isPasswordValid) {
       try {
-        console.log("All validations passed, preparing to authenticate");
-        console.log(
-          "GitHub Pages environment detected, using client-side storage"
+        console.log("All validations passed, preparing to send API request");
+
+        const requestData = {
+          email: emailInput.value,
+          password: passwordInput.value,
+        };
+
+        console.log("Request payload:", JSON.stringify(requestData));
+        console.log("Request method: POST");
+        console.log("Request headers: Content-Type: application/json");
+
+        const response = await fetch(
+          "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api/users/login",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestData),
+          }
         );
 
-        // Get users from localStorage
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        localStorage.setItem("brewAndClayUser", JSON.stringify(data));
+        window.location.href = "Home.html";
+      } catch (error) {
+        console.error("Login error:", error);
+        console.log("Error details:", {
+          message: error.message,
+          stack: error.stack,
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+        });
+
+        // Fallback to localStorage for GitHub Pages environment
         const users = JSON.parse(
           localStorage.getItem("brewAndClayUsers") || "[]"
         );
         console.log("Retrieved users from localStorage");
 
-        // Find user with matching email
         const user = users.find((user) => user.email === emailInput.value);
 
         if (!user) {
@@ -88,33 +121,9 @@ document.addEventListener("DOMContentLoaded", function () {
           return;
         }
 
-        // In a real app, we would hash and compare passwords
-        // For this GitHub Pages demo, we're simplifying authentication
-        // In a production environment, NEVER store or compare plain text passwords
-
-        // Since we don't store passwords in localStorage for security reasons,
-        // we'll simulate successful authentication for demo purposes
         console.log("User found, authentication successful");
-
-        // Save user data to localStorage
         localStorage.setItem("brewAndClayUser", JSON.stringify(user));
-        console.log("User data saved to localStorage");
-        console.log("Redirecting to Home.html");
-
-        // Redirect to home page
         window.location.href = "Home.html";
-      } catch (error) {
-        console.error("Login error:", error);
-
-        // Log detailed error information for debugging
-        console.log("Error details:", {
-          message: error.message,
-          stack: error.stack,
-          url: window.location.href,
-          userAgent: navigator.userAgent,
-        });
-
-        alert("An error occurred during login. Please try again later.");
       }
     } else {
       console.log("Form validation failed");
