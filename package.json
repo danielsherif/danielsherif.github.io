@@ -6,7 +6,7 @@
     "scripts": {
         "start": "node server.js",
         "dev": "nodemon server.js",
-        "build": "mkdir -p dist && cp -r index.html about.html Html css js Material MugImages dist/"
+        "build": "mkdir -p dist && cp -r index.html about.html Html CSS js Material MugImages dist/"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",
