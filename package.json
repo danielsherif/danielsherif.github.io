@@ -6,7 +6,7 @@
     "scripts": {
         "start": "node server.js",
         "dev": "nodemon server.js",
-        "build": "build.bat"
+        "build": "mkdir -p dist/css dist/js && cp -r index.html about.html Html Material MugImages dist/ && cp -r js/* dist/js/ 2>/dev/null || true && cp -r css/* dist/css/ 2>/dev/null || true"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",
