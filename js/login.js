@@ -68,41 +68,36 @@ document.addEventListener("DOMContentLoaded", function () {
     // If all validations pass
     if (isEmailValid && isPasswordValid) {
       try {
-        console.log("All validations passed, preparing to authenticate");
-        console.log(
-          "GitHub Pages environment detected, using client-side storage"
-        );
+        const response = await fetch("/api/users/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: emailInput.value,
+            password: passwordInput.value,
+          }),
+        });
 
-        // Get users from localStorage
-        const users = JSON.parse(
-          localStorage.getItem("brewAndClayUsers") || "[]"
-        );
-        console.log("Retrieved users from localStorage");
+        const data = await response.json();
 
-        // Find user with matching email
-        const user = users.find((user) => user.email === emailInput.value);
+        if (response.ok) {
+          // Store user data and token in localStorage
+          localStorage.setItem(
+            "brewAndClayUser",
+            JSON.stringify({
+              name: data.name,
+              email: data.email,
+              phone: data.phone,
+              token: data.token,
+            })
+          );
 
-        if (!user) {
-          console.log("User not found");
-          alert("Invalid email or password. Please try again.");
-          return;
+          // Redirect to home page
+          window.location.href = "/Html/Home.html";
+        } else {
+          throw new Error(data.message || "Authentication failed");
         }
-
-        // In a real app, we would hash and compare passwords
-        // For this GitHub Pages demo, we're simplifying authentication
-        // In a production environment, NEVER store or compare plain text passwords
-
-        // Since we don't store passwords in localStorage for security reasons,
-        // we'll simulate successful authentication for demo purposes
-        console.log("User found, authentication successful");
-
-        // Save user data to localStorage
-        localStorage.setItem("brewAndClayUser", JSON.stringify(user));
-        console.log("User data saved to localStorage");
-        console.log("Redirecting to Home.html");
-
-        // Redirect to home page
-        window.location.href = "Home.html";
       } catch (error) {
         console.error("Login error:", error);
 
@@ -114,7 +109,9 @@ document.addEventListener("DOMContentLoaded", function () {
           userAgent: navigator.userAgent,
         });
 
-        alert("An error occurred during login. Please try again later.");
+        alert(
+          error.message || "An error occurred during login. Please try again."
+        );
       }
     } else {
       console.log("Form validation failed");
