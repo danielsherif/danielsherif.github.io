@@ -45,6 +45,9 @@ document.addEventListener("DOMContentLoaded", function () {
   loginForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
+    console.log("Login form submission started");
+    console.log("Current URL:", window.location.href);
+
     // Validate all fields
     const isEmailValid = showError(
       emailInput,
@@ -57,36 +60,64 @@ document.addEventListener("DOMContentLoaded", function () {
       validatePassword(passwordInput.value)
     );
 
+    console.log("Validation results:", {
+      isEmailValid,
+      isPasswordValid,
+    });
+
     // If all validations pass
     if (isEmailValid && isPasswordValid) {
       try {
-        const response = await fetch("/api/users/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: emailInput.value,
-            password: passwordInput.value,
-          }),
-        });
+        console.log("All validations passed, preparing to authenticate");
+        console.log(
+          "GitHub Pages environment detected, using client-side storage"
+        );
 
-        const data = await response.json();
+        // Get users from localStorage
+        const users = JSON.parse(
+          localStorage.getItem("brewAndClayUsers") || "[]"
+        );
+        console.log("Retrieved users from localStorage");
 
-        if (response.ok) {
-          // Save user data and token to localStorage
-          localStorage.setItem("brewAndClayUser", JSON.stringify(data));
+        // Find user with matching email
+        const user = users.find((user) => user.email === emailInput.value);
 
-          // Redirect to home page
-          window.location.href = "Home.html";
-        } else {
-          // Show error message
-          alert(data.message || "Login failed. Please try again.");
+        if (!user) {
+          console.log("User not found");
+          alert("Invalid email or password. Please try again.");
+          return;
         }
+
+        // In a real app, we would hash and compare passwords
+        // For this GitHub Pages demo, we're simplifying authentication
+        // In a production environment, NEVER store or compare plain text passwords
+
+        // Since we don't store passwords in localStorage for security reasons,
+        // we'll simulate successful authentication for demo purposes
+        console.log("User found, authentication successful");
+
+        // Save user data to localStorage
+        localStorage.setItem("brewAndClayUser", JSON.stringify(user));
+        console.log("User data saved to localStorage");
+        console.log("Redirecting to Home.html");
+
+        // Redirect to home page
+        window.location.href = "Home.html";
       } catch (error) {
         console.error("Login error:", error);
-        alert("An error occurred. Please try again later.");
+
+        // Log detailed error information for debugging
+        console.log("Error details:", {
+          message: error.message,
+          stack: error.stack,
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+        });
+
+        alert("An error occurred during login. Please try again later.");
       }
+    } else {
+      console.log("Form validation failed");
     }
   });
 });

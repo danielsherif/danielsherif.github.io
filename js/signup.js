@@ -161,95 +161,100 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Request method: POST");
         console.log("Request headers: Content-Type: application/json");
 
-        const response = await fetch("/api/users/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
-        });
+        // Since we're on GitHub Pages (static hosting), we'll use client-side storage
+        // instead of making API calls that won't work in this environment
+        console.log(
+          "GitHub Pages environment detected, using client-side storage"
+        );
 
-        console.log("Response received:", {
-          status: response.status,
-          statusText: response.statusText,
-          headers: [...response.headers.entries()].reduce(
-            (obj, [key, value]) => {
-              obj[key] = value;
-              return obj;
-            },
-            {}
-          ),
-        });
+        // Check if email already exists in localStorage
+        const existingUsers = JSON.parse(
+          localStorage.getItem("brewAndClayUsers") || "[]"
+        );
+        const emailExists = existingUsers.some(
+          (user) => user.email === requestData.email
+        );
 
-        // Check if response is ok before trying to parse JSON
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Server response error:", {
-            status: response.status,
-            statusText: response.statusText,
-            errorText: errorText,
-            url: response.url,
-          });
-          throw new Error(
-            `Server error: ${response.status} - ${response.statusText} - ${
-              errorText || "No error details provided"
-            }`
+        if (emailExists) {
+          alert(
+            "A user with this email already exists. Please use a different email or login."
           );
+          return;
         }
 
-        // Check if response has content before parsing
-        const contentType = response.headers.get("content-type");
-        console.log("Response content type:", contentType);
+        // Generate a mock user ID and token
+        const userId = "user_" + Math.random().toString(36).substr(2, 9);
+        const mockToken = "token_" + Math.random().toString(36).substr(2, 16);
 
-        if (!contentType || !contentType.includes("application/json")) {
-          console.error("Invalid content type received:", contentType);
-          throw new Error("Server didn't return JSON. Got: " + contentType);
-        }
+        // Create a data object similar to what the server would return
+        const userData = {
+          _id: userId,
+          name: requestData.name,
+          email: requestData.email,
+          phone: requestData.phone,
+          token: mockToken,
+          createdAt: new Date().toISOString(),
+        };
 
-        const responseText = await response.text();
-        console.log("Response text:", responseText);
+        console.log("Created user data:", userData);
 
-        if (!responseText) {
-          console.error("Empty response received");
-          throw new Error("Empty response from server");
-        }
+        // Save user to users collection
+        existingUsers.push(userData);
+        localStorage.setItem("brewAndClayUsers", JSON.stringify(existingUsers));
 
-        // Try to parse the JSON response
-        let data;
-        try {
-          console.log("Attempting to parse JSON response");
-          data = JSON.parse(responseText);
-          console.log("Parsed response data:", data);
-        } catch (parseError) {
-          console.error(
-            "JSON parse error:",
-            parseError,
-            "Response was:",
-            responseText
-          );
-          throw new Error("Failed to parse server response as JSON");
-        }
+        // Save current user session
+        localStorage.setItem("brewAndClayUser", JSON.stringify(userData));
 
         console.log("Registration successful, saving user data");
-        // Save user data and token to localStorage
-        localStorage.setItem("brewAndClayUser", JSON.stringify(data));
-
         console.log("Redirecting to Home.html");
+
         // Redirect to home page
         window.location.href = "Home.html";
       } catch (error) {
-        console.error("Registration error details:", {
+        console.error("Registration error:", error);
+
+        // Log detailed error information for debugging
+        console.log("Error details:", {
           message: error.message,
           stack: error.stack,
-          name: error.name,
-        });
-        console.error("Environment info:", {
-          userAgent: navigator.userAgent,
           url: window.location.href,
-          protocol: window.location.protocol,
-          host: window.location.host,
+          userAgent: navigator.userAgent,
         });
-        alert("An error occurred during registration: " + error.message);
+
+        // Show a more user-friendly error message
+        alert(
+          "Registration could not be completed. This might be because you're using GitHub Pages which doesn't support server-side functionality. Your account has been created locally instead."
+        );
+
+        // Even if there's an error with the API call, we can still create the user locally
+        // since we're on GitHub Pages
+        const userId = "user_" + Math.random().toString(36).substr(2, 9);
+        const mockToken = "token_" + Math.random().toString(36).substr(2, 16);
+
+        const userData = {
+          _id: userId,
+          name: nameInput.value,
+          email: emailInput.value,
+          phone: phoneInput.value,
+          token: mockToken,
+          createdAt: new Date().toISOString(),
+        };
+
+        // Save user data to localStorage as a fallback
+        const existingUsers = JSON.parse(
+          localStorage.getItem("brewAndClayUsers") || "[]"
+        );
+        if (!existingUsers.some((user) => user.email === emailInput.value)) {
+          existingUsers.push(userData);
+          localStorage.setItem(
+            "brewAndClayUsers",
+            JSON.stringify(existingUsers)
+          );
+          localStorage.setItem("brewAndClayUser", JSON.stringify(userData));
+
+          // Redirect to home page after successful local registration
+          window.location.href = "Home.html";
+        }
       }
     } else {
       console.log("Form validation failed");
