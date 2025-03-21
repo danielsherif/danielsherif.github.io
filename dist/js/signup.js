@@ -161,32 +161,45 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Request method: POST");
         console.log("Request headers: Content-Type: application/json");
 
-        // Since we're on GitHub Pages (static hosting), we'll use client-side storage
-        // instead of making API calls that won't work in this environment
-        console.log(
-          "GitHub Pages environment detected, using client-side storage"
-        );
+        const response = await fetch("/api/users/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        });
 
-        // Check if email already exists in localStorage
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        localStorage.setItem("brewAndClayUser", JSON.stringify(data));
+        window.location.href = "Home.html";
+      } catch (error) {
+        console.error("Registration error:", error);
+        console.log("Error details:", {
+          message: error.message,
+          stack: error.stack,
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+        });
+
+        // Fallback to localStorage for GitHub Pages environment
         const existingUsers = JSON.parse(
           localStorage.getItem("brewAndClayUsers") || "[]"
         );
-        const emailExists = existingUsers.some(
-          (user) => user.email === requestData.email
-        );
 
-        if (emailExists) {
+        if (existingUsers.some((user) => user.email === requestData.email)) {
           alert(
             "A user with this email already exists. Please use a different email or login."
           );
           return;
         }
 
-        // Generate a mock user ID and token
         const userId = "user_" + Math.random().toString(36).substr(2, 9);
         const mockToken = "token_" + Math.random().toString(36).substr(2, 16);
 
-        // Create a data object similar to what the server would return
         const userData = {
           _id: userId,
           name: requestData.name,
@@ -196,65 +209,12 @@ document.addEventListener("DOMContentLoaded", function () {
           createdAt: new Date().toISOString(),
         };
 
-        console.log("Created user data:", userData);
-
-        // Save user to users collection
         existingUsers.push(userData);
         localStorage.setItem("brewAndClayUsers", JSON.stringify(existingUsers));
-
-        // Save current user session
         localStorage.setItem("brewAndClayUser", JSON.stringify(userData));
 
-        console.log("Registration successful, saving user data");
-        console.log("Redirecting to Home.html");
-
-        // Redirect to home page
+        alert("Registration successful! Redirecting to home page...");
         window.location.href = "Home.html";
-      } catch (error) {
-        console.error("Registration error:", error);
-
-        // Log detailed error information for debugging
-        console.log("Error details:", {
-          message: error.message,
-          stack: error.stack,
-          url: window.location.href,
-          userAgent: navigator.userAgent,
-        });
-
-        // Show a more user-friendly error message
-        alert(
-          "Registration could not be completed. This might be because you're using GitHub Pages which doesn't support server-side functionality. Your account has been created locally instead."
-        );
-
-        // Even if there's an error with the API call, we can still create the user locally
-        // since we're on GitHub Pages
-        const userId = "user_" + Math.random().toString(36).substr(2, 9);
-        const mockToken = "token_" + Math.random().toString(36).substr(2, 16);
-
-        const userData = {
-          _id: userId,
-          name: nameInput.value,
-          email: emailInput.value,
-          phone: phoneInput.value,
-          token: mockToken,
-          createdAt: new Date().toISOString(),
-        };
-
-        // Save user data to localStorage as a fallback
-        const existingUsers = JSON.parse(
-          localStorage.getItem("brewAndClayUsers") || "[]"
-        );
-        if (!existingUsers.some((user) => user.email === emailInput.value)) {
-          existingUsers.push(userData);
-          localStorage.setItem(
-            "brewAndClayUsers",
-            JSON.stringify(existingUsers)
-          );
-          localStorage.setItem("brewAndClayUser", JSON.stringify(userData));
-
-          // Redirect to home page after successful local registration
-          window.location.href = "Home.html";
-        }
       }
     } else {
       console.log("Form validation failed");
