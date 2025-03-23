@@ -10,23 +10,28 @@ require("dotenv").config();
 const app = express();
 
 // Middleware
-// Add OPTIONS handler for preflight requests
-app.options("*", cors());
-
 // Configure CORS with all necessary options
-app.use(
-  cors({
-    origin: [
-      "https://brewandclay.me",
-      "https://sweet-cobbler-5c0ef9.netlify.app",
-      "http://localhost:3000",
-    ],
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-    credentials: true,
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-  })
-);
+const corsOptions = {
+  origin: [
+    "https://brewandclay.me",
+    "https://sweet-cobbler-5c0ef9.netlify.app",
+    "http://localhost:3000",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+  ],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+  allowedHeaders: "Content-Type,Authorization,Origin,Accept",
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+  maxAge: 86400, // 24 hours
+};
+
+// Enable pre-flight requests for all routes
+app.options("*", cors(corsOptions));
+
+// Apply CORS middleware to all routes
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // MongoDB connection
@@ -119,8 +124,8 @@ const generateToken = (userId) => {
 
 // API Routes
 
-// Register route
-app.post("/users/register", async (req, res) => {
+// Register route - support both path formats
+app.post(["/users/register", "/api/users/register"], async (req, res) => {
   try {
     await connectToDatabase();
 
@@ -169,8 +174,8 @@ app.post("/users/register", async (req, res) => {
   }
 });
 
-// Login route
-app.post("/users/login", async (req, res) => {
+// Login route - support both path formats
+app.post(["/users/login", "/api/users/login"], async (req, res) => {
   try {
     await connectToDatabase();
 
