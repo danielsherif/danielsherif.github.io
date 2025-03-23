@@ -99,9 +99,12 @@ document.addEventListener("DOMContentLoaded", function () {
             apiUrl
           );
         } else {
-          // When running on the deployed site, use the redirect rule
-          apiUrl = "/api/users/login";
-          console.log("Running on deployed site, using redirect URL:", apiUrl);
+          // When running on the deployed site, use the direct Netlify Functions URL instead of the redirect rule
+          apiUrl = "/.netlify/functions/api/users/login";
+          console.log(
+            "Running on deployed site, using Netlify Functions URL:",
+            apiUrl
+          );
         }
 
         console.log("Using API URL:", apiUrl);
