@@ -10,7 +10,16 @@ require("dotenv").config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://brewandclay.me",
+      "https://sweet-cobbler-5c0ef9.netlify.app",
+      "http://localhost:3000",
+    ],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // MongoDB connection
@@ -104,7 +113,7 @@ const generateToken = (userId) => {
 // API Routes
 
 // Register route
-app.post("/api/users/register", async (req, res) => {
+app.post("/users/register", async (req, res) => {
   try {
     await connectToDatabase();
 
@@ -154,7 +163,7 @@ app.post("/api/users/register", async (req, res) => {
 });
 
 // Login route
-app.post("/api/users/login", async (req, res) => {
+app.post("/users/login", async (req, res) => {
   try {
     await connectToDatabase();
 
