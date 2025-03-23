@@ -79,8 +79,9 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Request method: POST");
         console.log("Request headers: Content-Type: application/json");
 
-        // Use relative URL path which works with netlify.toml redirects
-        const apiUrl = "/api/users/login";
+        // Use the full Netlify Functions URL instead of relative path
+        const apiUrl =
+          "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api/users/login";
         console.log("Using API URL:", apiUrl);
 
         const response = await fetch(apiUrl, {
