@@ -20,10 +20,11 @@ const corsOptions = {
     "http://127.0.0.1:8080",
   ],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-  allowedHeaders: "Content-Type,Authorization,Origin,Accept",
+  allowedHeaders: "Content-Type,Authorization,Origin,Accept,X-Requested-With",
+  exposedHeaders: "Content-Length,Content-Type",
   credentials: true,
   preflightContinue: false,
-  optionsSuccessStatus: 204,
+  optionsSuccessStatus: 200,
   maxAge: 86400, // 24 hours
 };
 
@@ -32,6 +33,18 @@ app.options("*", cors(corsOptions));
 
 // Apply CORS middleware to all routes
 app.use(cors(corsOptions));
+
+// Add explicit handler for OPTIONS requests
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    res.header(
+      "Access-Control-Allow-Methods",
+      "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS"
+    );
+    return res.status(200).json({});
+  }
+  return next();
+});
 app.use(express.json());
 
 // MongoDB connection

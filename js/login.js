@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Check if we're running locally (file://) or on the production site
         if (window.location.protocol === "file:") {
-          // When running locally, use the absolute URL
+          // When running locally, use the absolute URL with .netlify/functions path
           apiUrl =
             "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api/users/login";
           console.log("Running locally, using absolute URL:", apiUrl);

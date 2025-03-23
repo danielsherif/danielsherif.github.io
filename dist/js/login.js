@@ -79,9 +79,31 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Request method: POST");
         console.log("Request headers: Content-Type: application/json");
 
-        // Use the API URL with the redirect rule format
-        const apiUrl =
-          "https://sweet-cobbler-5c0ef9.netlify.app/api/users/login";
+        // Determine the appropriate API URL based on the current environment
+        let apiUrl;
+
+        // Check if we're running locally (file://) or on the production site
+        if (window.location.protocol === "file:") {
+          // When running locally, use the absolute URL with .netlify/functions path
+          apiUrl =
+            "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api/users/login";
+          console.log("Running locally, using absolute URL:", apiUrl);
+        } else if (
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1"
+        ) {
+          // When running on localhost server
+          apiUrl = "/.netlify/functions/api/users/login";
+          console.log(
+            "Running on localhost server, using relative URL:",
+            apiUrl
+          );
+        } else {
+          // When running on the deployed site, use the redirect rule
+          apiUrl = "/api/users/login";
+          console.log("Running on deployed site, using redirect URL:", apiUrl);
+        }
+
         console.log("Using API URL:", apiUrl);
 
         const response = await fetch(apiUrl, {
