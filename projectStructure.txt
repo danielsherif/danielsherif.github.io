@@ -1,0 +1,177 @@
+# Brew and Clay - Project Structure Documentation
+
+## Overview
+Brew and Clay is an e-commerce website specializing in artisan mugs and pottery products. The project uses a modern web architecture with a frontend hosted on GitHub Pages and a backend powered by Netlify Functions and MongoDB.
+
+## Project Architecture
+
+### Frontend
+The frontend is built with HTML, CSS, and vanilla JavaScript, following a multi-page application approach. It uses Tailwind CSS for styling and various libraries like Font Awesome for icons and Glide.js for carousels.
+
+### Backend
+The backend is implemented in two ways:
+1. **Express.js Server**: A traditional Node.js/Express server (server.js) for local development
+2. **Serverless Functions**: Netlify Functions for production deployment
+
+### Database
+MongoDB is used as the database, with Mongoose as the ODM (Object Document Mapper) for schema definition and data validation.
+
+## Folder Structure
+
+### Root Directory
+- `index.html`, `about.html`: Main entry points for the website
+- `package.json`: Defines project dependencies and scripts
+- `server.js`: Express server for local development
+- `netlify.toml`: Configuration for Netlify deployment
+- `.env`: Environment variables (not tracked in git)
+
+### HTML Directory
+- Contains all HTML pages for the website:
+  - `Home.html`: Landing page
+  - `AllProducts.html`: Products listing page
+  - `ProductView.html`: Individual product details
+  - `Cart.html`: Shopping cart
+  - `Checkout.html`: Checkout process
+  - `Login.html` & `SignUp.html`: Authentication pages
+  - `AboutUs.html`: Company information
+  - `Collections.html`: Product collections/categories
+
+### JavaScript (js) Directory
+- `database.js`: Client-side product database (mock data)
+- `login.js` & `signup.js`: Authentication functionality
+- `main.js`: Core application logic
+- `ui.js`: UI-related functionality
+- `mobile.js` & `mobile-products.js`: Mobile-specific functionality
+- `email.js`: Email functionality (likely for order confirmations)
+
+### Models Directory
+- `User.js`: User schema and methods
+- `Cart.js`: Shopping cart schema
+- `Wishlist.js`: Wishlist schema
+
+### Routes Directory
+- `userRoutes.js`: API endpoints for user management
+- `cartRoutes.js`: API endpoints for cart operations
+- `wishlistRoutes.js`: API endpoints for wishlist operations
+
+### Middleware Directory
+- `authMiddleware.js`: Authentication middleware
+
+### Netlify Directory
+- `functions/api.js`: Serverless function for API endpoints
+
+### Assets Directories
+- `Material/`: Logo and branding assets
+- `MugImages/`: Product images
+
+## Key Components and Functionality
+
+### User Authentication
+
+#### User Model (`models/User.js`)
+- Schema defines user properties: name, email, phone, password
+- Includes validation for Egyptian phone numbers (01XXXXXXXXX)
+- Password hashing using bcrypt
+- Methods for password verification
+
+#### Authentication Flow
+1. **Registration (`signup.js`, `userRoutes.js`):**
+   - Client-side validation in signup.js
+   - Server-side validation and user creation in userRoutes.js
+   - Password hashing before storage
+   - JWT token generation upon successful registration
+
+2. **Login (`login.js`, `userRoutes.js`):**
+   - Client-side validation in login.js
+   - Server-side authentication in userRoutes.js
+   - JWT token generation upon successful login
+
+3. **Route Protection:**
+   - JWT verification middleware (`authMiddleware.js`)
+   - Used to protect private routes
+
+### Shopping Cart
+
+#### Cart Model (`models/Cart.js`)
+- Schema defines cart structure with user reference and array of items
+- Each item includes productId, name, price, image, quantity
+
+#### Cart Functionality (`cartRoutes.js`)
+- Get user's cart
+- Add item to cart
+- Update item quantity
+- Remove item from cart
+- Clear entire cart
+
+### Wishlist
+
+#### Wishlist Model (`models/Wishlist.js`)
+- Similar to Cart model but without quantity field
+- Stores user's saved items for future purchase
+
+#### Wishlist Functionality (`wishlistRoutes.js`)
+- Get user's wishlist
+- Add item to wishlist
+- Remove item from wishlist
+- Move item from wishlist to cart
+
+### Product Database
+
+#### Client-side (`database.js`)
+- Contains mock product data with details like id, name, price, description, category, image
+- Used for displaying products on the frontend
+
+### API Integration
+
+#### Express Server (`server.js`)
+- Configures Express application
+- Sets up middleware (CORS, JSON parsing)
+- Defines API routes
+- Connects to MongoDB
+- Serves static files
+
+#### Netlify Functions (`netlify/functions/api.js`)
+- Serverless implementation of the Express server
+- Uses serverless-http to wrap Express app
+- Implements the same routes as server.js
+- Uses connection pooling for MongoDB
+
+### Deployment
+
+#### Netlify Configuration (`netlify.toml`)
+- Defines build settings
+- Configures functions directory
+- Sets up API redirects
+
+#### Build Process (`package.json`)
+- Script to copy necessary files to dist directory
+- Prepares the application for deployment
+
+## Data Flow
+
+### User Registration/Login
+1. User enters credentials on frontend
+2. Client-side validation occurs
+3. Data sent to API endpoint
+4. Server validates data and interacts with database
+5. JWT token returned to client
+6. Token stored in localStorage for session management
+
+### Shopping Experience
+1. Products loaded from database.js (client-side) or MongoDB (server-side)
+2. User browses products and adds to cart
+3. Cart data sent to API for storage in MongoDB
+4. Cart persists across sessions for logged-in users
+5. Checkout process collects shipping and payment info
+
+## Security Considerations
+
+- Passwords hashed using bcrypt
+- JWT used for authentication
+- Protected routes require valid token
+- Input validation on both client and server
+- MongoDB connection string stored in environment variables
+
+## Conclusion
+
+The Brew and Clay e-commerce website follows a traditional web architecture with modern tools. It separates concerns between frontend and backend while providing a seamless shopping experience. The use of Netlify Functions allows for serverless deployment, reducing infrastructure costs while maintaining full functionality.
