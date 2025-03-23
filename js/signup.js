@@ -161,16 +161,17 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Request method: POST");
         console.log("Request headers: Content-Type: application/json");
 
-        const response = await fetch(
-          "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api/users/register",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(requestData),
-          }
-        );
+        // Use relative URL path which works with netlify.toml redirects
+        const apiUrl = "/api/users/register";
+        console.log("Using API URL:", apiUrl);
+
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        });
 
         const data = await response.json();
 

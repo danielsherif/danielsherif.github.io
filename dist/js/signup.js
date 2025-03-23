@@ -161,26 +161,44 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Request method: POST");
         console.log("Request headers: Content-Type: application/json");
 
-        const response = await fetch(
-          "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api/users/register",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(requestData),
-          }
-        );
+        // Use relative URL path which works with netlify.toml redirects
+        const apiUrl = "/api/users/register";
+        console.log("Using API URL:", apiUrl);
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        });
 
         const data = await response.json();
-        localStorage.setItem("brewAndClayUser", JSON.stringify(data));
-        window.location.href = "Home.html";
+
+        if (response.ok) {
+          // Store user data and token in localStorage
+          localStorage.setItem(
+            "brewAndClayUser",
+            JSON.stringify({
+              name: data.name,
+              email: data.email,
+              phone: data.phone,
+              token: data.token,
+            })
+          );
+
+          console.log("User data saved to localStorage");
+          console.log("Redirecting to Home.html");
+
+          // Redirect to home page
+          window.location.href = "/Html/Home.html";
+        } else {
+          throw new Error(data.message || "Registration failed");
+        }
       } catch (error) {
         console.error("Registration error:", error);
+
+        // Log detailed error information for debugging
         console.log("Error details:", {
           message: error.message,
           stack: error.stack,
@@ -188,36 +206,10 @@ document.addEventListener("DOMContentLoaded", function () {
           userAgent: navigator.userAgent,
         });
 
-        // Fallback to localStorage for GitHub Pages environment
-        const existingUsers = JSON.parse(
-          localStorage.getItem("brewAndClayUsers") || "[]"
+        alert(
+          error.message ||
+            "An error occurred during registration. Please try again."
         );
-
-        if (existingUsers.some((user) => user.email === requestData.email)) {
-          alert(
-            "A user with this email already exists. Please use a different email or login."
-          );
-          return;
-        }
-
-        const userId = "user_" + Math.random().toString(36).substr(2, 9);
-        const mockToken = "token_" + Math.random().toString(36).substr(2, 16);
-
-        const userData = {
-          _id: userId,
-          name: requestData.name,
-          email: requestData.email,
-          phone: requestData.phone,
-          token: mockToken,
-          createdAt: new Date().toISOString(),
-        };
-
-        existingUsers.push(userData);
-        localStorage.setItem("brewAndClayUsers", JSON.stringify(existingUsers));
-        localStorage.setItem("brewAndClayUser", JSON.stringify(userData));
-
-        alert("Registration successful! Redirecting to home page...");
-        window.location.href = "Home.html";
       }
     } else {
       console.log("Form validation failed");

@@ -47,7 +47,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("Login form submission started");
     console.log("Current URL:", window.location.href);
-    console.log("API endpoint being called: /api/users/login");
 
     // Validate all fields
     const isEmailValid = showError(
@@ -80,26 +79,41 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Request method: POST");
         console.log("Request headers: Content-Type: application/json");
 
-        const response = await fetch(
-          "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api/users/login",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(requestData),
-          }
-        );
+        // Use relative URL path which works with netlify.toml redirects
+        const apiUrl = "/api/users/login";
+        console.log("Using API URL:", apiUrl);
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        });
 
         const data = await response.json();
-        localStorage.setItem("brewAndClayUser", JSON.stringify(data));
-        window.location.href = "Home.html";
+
+        if (response.ok) {
+          // Store user data and token in localStorage
+          localStorage.setItem(
+            "brewAndClayUser",
+            JSON.stringify({
+              name: data.name,
+              email: data.email,
+              phone: data.phone,
+              token: data.token,
+            })
+          );
+
+          // Redirect to home page
+          window.location.href = "/Html/Home.html";
+        } else {
+          throw new Error(data.message || "Authentication failed");
+        }
       } catch (error) {
         console.error("Login error:", error);
+
+        // Log detailed error information for debugging
         console.log("Error details:", {
           message: error.message,
           stack: error.stack,
@@ -107,23 +121,9 @@ document.addEventListener("DOMContentLoaded", function () {
           userAgent: navigator.userAgent,
         });
 
-        // Fallback to localStorage for GitHub Pages environment
-        const users = JSON.parse(
-          localStorage.getItem("brewAndClayUsers") || "[]"
+        alert(
+          error.message || "An error occurred during login. Please try again."
         );
-        console.log("Retrieved users from localStorage");
-
-        const user = users.find((user) => user.email === emailInput.value);
-
-        if (!user) {
-          console.log("User not found");
-          alert("Invalid email or password. Please try again.");
-          return;
-        }
-
-        console.log("User found, authentication successful");
-        localStorage.setItem("brewAndClayUser", JSON.stringify(user));
-        window.location.href = "Home.html";
       }
     } else {
       console.log("Form validation failed");
