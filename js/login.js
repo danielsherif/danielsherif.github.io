@@ -68,16 +68,27 @@ document.addEventListener("DOMContentLoaded", function () {
     // If all validations pass
     if (isEmailValid && isPasswordValid) {
       try {
-        const response = await fetch("/api/users/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: emailInput.value,
-            password: passwordInput.value,
-          }),
-        });
+        console.log("All validations passed, preparing to send API request");
+
+        const requestData = {
+          email: emailInput.value,
+          password: passwordInput.value,
+        };
+
+        console.log("Request payload:", JSON.stringify(requestData));
+        console.log("Request method: POST");
+        console.log("Request headers: Content-Type: application/json");
+
+        const response = await fetch(
+          "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api/users/login",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestData),
+          }
+        );
 
         const data = await response.json();
 

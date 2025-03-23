@@ -148,18 +148,29 @@ document.addEventListener("DOMContentLoaded", function () {
       isConfirmPasswordValid
     ) {
       try {
-        const response = await fetch("/api/users/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: nameInput.value,
-            email: emailInput.value,
-            phone: phoneInput.value,
-            password: passwordInput.value,
-          }),
-        });
+        console.log("All validations passed, preparing to send API request");
+
+        const requestData = {
+          name: nameInput.value,
+          email: emailInput.value,
+          phone: phoneInput.value,
+          password: passwordInput.value,
+        };
+
+        console.log("Request payload:", JSON.stringify(requestData));
+        console.log("Request method: POST");
+        console.log("Request headers: Content-Type: application/json");
+
+        const response = await fetch(
+          "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api/users/register",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestData),
+          }
+        );
 
         const data = await response.json();
 
