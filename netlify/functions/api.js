@@ -10,6 +10,10 @@ require("dotenv").config();
 const app = express();
 
 // Middleware
+// Add OPTIONS handler for preflight requests
+app.options("*", cors());
+
+// Configure CORS with all necessary options
 app.use(
   cors({
     origin: [
@@ -17,7 +21,10 @@ app.use(
       "https://sweet-cobbler-5c0ef9.netlify.app",
       "http://localhost:3000",
     ],
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   })
 );
 app.use(express.json());

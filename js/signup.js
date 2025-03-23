@@ -161,9 +161,9 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Request method: POST");
         console.log("Request headers: Content-Type: application/json");
 
-        // Use the full Netlify Functions URL instead of relative path
-        const apiUrl =
-          "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api/users/register";
+        // Use relative URL path to avoid CORS issues
+        // This will use the current origin and rely on Netlify redirects
+        const apiUrl = "/api/users/register";
         console.log("Using API URL:", apiUrl);
 
         const response = await fetch(apiUrl, {
