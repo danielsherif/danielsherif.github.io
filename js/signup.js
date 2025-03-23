@@ -148,21 +148,18 @@ document.addEventListener("DOMContentLoaded", function () {
       isConfirmPasswordValid
     ) {
       try {
-        const response = await fetch(
-          "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api/users/register",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              name: nameInput.value,
-              email: emailInput.value,
-              phone: phoneInput.value,
-              password: passwordInput.value,
-            }),
-          }
-        );
+        const response = await fetch("/api/users/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: nameInput.value,
+            email: emailInput.value,
+            phone: phoneInput.value,
+            password: passwordInput.value,
+          }),
+        });
 
         const data = await response.json();
 
