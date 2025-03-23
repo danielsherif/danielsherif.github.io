@@ -34,14 +34,47 @@ app.options("*", cors(corsOptions));
 // Apply CORS middleware to all routes
 app.use(cors(corsOptions));
 
+// Add explicit route for login OPTIONS requests
+app.options(["/users/login", "/api/users/login"], (req, res) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Max-Age", "86400");
+  res.header("Content-Length", "0");
+  res.status(200).end();
+});
+
 // Add explicit handler for OPTIONS requests
 app.use((req, res, next) => {
   if (req.method === "OPTIONS") {
+    // Handle CORS preflight requests
+    // Set the appropriate headers for CORS
+    if (Array.isArray(corsOptions.origin)) {
+      // If origin is an array, check if the request origin is in the allowed list
+      const requestOrigin = req.headers.origin;
+      if (corsOptions.origin.includes(requestOrigin)) {
+        res.header("Access-Control-Allow-Origin", requestOrigin);
+      } else {
+        // If not in the list, set to the first allowed origin
+        res.header("Access-Control-Allow-Origin", corsOptions.origin[0]);
+      }
+    } else {
+      res.header("Access-Control-Allow-Origin", corsOptions.origin || "*");
+    }
+
     res.header(
       "Access-Control-Allow-Methods",
       "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS"
     );
-    return res.status(200).json({});
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    );
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Max-Age", "86400"); // 24 hours
+    res.header("Content-Length", "0");
+    res.header("Content-Type", "application/json");
+    return res.status(200).end();
   }
   return next();
 });

@@ -114,7 +114,24 @@ document.addEventListener("DOMContentLoaded", function () {
           body: JSON.stringify(requestData),
         });
 
-        const data = await response.json();
+        // Check if response is ok before trying to parse JSON
+        if (!response.ok) {
+          throw new Error(
+            `HTTP error! Status: ${response.status}, ${response.statusText}`
+          );
+        }
+
+        // Check if response has content before parsing JSON
+        const contentType = response.headers.get("content-type");
+        let data;
+        if (contentType && contentType.includes("application/json")) {
+          const text = await response.text();
+          data = text ? JSON.parse(text) : {};
+        } else {
+          throw new Error(
+            `Invalid response format: ${contentType || "unknown"}`
+          );
+        }
 
         if (response.ok) {
           // Store user data and token in localStorage
