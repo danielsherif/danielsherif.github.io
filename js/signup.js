@@ -1,4 +1,7 @@
-// Client-side validation for signup form
+// Client-side validation and authentication for signup form
+const API_URL =
+  "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api";
+
 document.addEventListener("DOMContentLoaded", function () {
   const signupForm = document.getElementById("signup-form");
   const nameInput = document.getElementById("name");
@@ -56,53 +59,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Name validation on blur
   nameInput.addEventListener("blur", function () {
-    const isValid = validateName(nameInput.value);
-    showError(nameInput, nameError, isValid);
+    showError(nameInput, nameError, validateName(nameInput.value));
   });
 
   // Email validation on blur
   emailInput.addEventListener("blur", function () {
-    const isValid = validateEmail(emailInput.value);
-    showError(emailInput, emailError, isValid);
+    showError(emailInput, emailError, validateEmail(emailInput.value));
   });
 
   // Phone validation on blur
   phoneInput.addEventListener("blur", function () {
-    const isValid = validatePhone(phoneInput.value);
-    showError(phoneInput, phoneError, isValid);
+    showError(phoneInput, phoneError, validatePhone(phoneInput.value));
   });
 
   // Password validation on blur
   passwordInput.addEventListener("blur", function () {
-    const isValid = validatePassword(passwordInput.value);
-    showError(passwordInput, passwordError, isValid);
-
-    // Also validate confirm password if it has a value
-    if (confirmPasswordInput.value) {
-      const isConfirmValid = validateConfirmPassword(
-        passwordInput.value,
-        confirmPasswordInput.value
-      );
-      showError(confirmPasswordInput, confirmPasswordError, isConfirmValid);
-    }
+    showError(
+      passwordInput,
+      passwordError,
+      validatePassword(passwordInput.value)
+    );
   });
 
   // Confirm password validation on blur
   confirmPasswordInput.addEventListener("blur", function () {
-    const isValid = validateConfirmPassword(
-      passwordInput.value,
-      confirmPasswordInput.value
+    showError(
+      confirmPasswordInput,
+      confirmPasswordError,
+      validateConfirmPassword(passwordInput.value, confirmPasswordInput.value)
     );
-    showError(confirmPasswordInput, confirmPasswordError, isValid);
   });
 
   // Form submission
   signupForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    console.log("Form submission started");
-    console.log("Current URL:", window.location.href);
-    console.log("API endpoint being called: /api/users/register");
+    console.log("Signup form submission started");
 
     // Validate all fields
     const isNameValid = showError(
@@ -131,15 +123,6 @@ document.addEventListener("DOMContentLoaded", function () {
       validateConfirmPassword(passwordInput.value, confirmPasswordInput.value)
     );
 
-    console.log("Validation results:", {
-      isNameValid,
-      isEmailValid,
-      isPhoneValid,
-      isPasswordValid,
-      isConfirmPasswordValid,
-    });
-
-    // If all validations pass
     if (
       isNameValid &&
       isEmailValid &&
@@ -148,90 +131,32 @@ document.addEventListener("DOMContentLoaded", function () {
       isConfirmPasswordValid
     ) {
       try {
-        console.log("All validations passed, preparing to send API request");
+        console.log("Sending signup request...");
 
-        const requestData = {
-          name: nameInput.value,
-          email: emailInput.value,
-          phone: phoneInput.value,
-          password: passwordInput.value,
-        };
-
-        console.log("Request payload:", JSON.stringify(requestData));
-        console.log("Request method: POST");
-        console.log("Request headers: Content-Type: application/json");
-
-        // Determine the appropriate API URL based on the current environment
-        let apiUrl;
-
-        // Check if we're running locally (file://) or on the production site
-        if (window.location.protocol === "file:") {
-          // When running locally, use the absolute URL with .netlify/functions path
-          apiUrl =
-            "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api/users/register";
-          console.log("Running locally, using absolute URL:", apiUrl);
-        } else if (
-          window.location.hostname === "localhost" ||
-          window.location.hostname === "127.0.0.1"
-        ) {
-          // When running on localhost server
-          apiUrl = "/.netlify/functions/api/users/register";
-          console.log(
-            "Running on localhost server, using relative URL:",
-            apiUrl
-          );
-        } else {
-          // When running on the deployed site, use the redirect rule
-          apiUrl = "/api/users/register";
-          console.log("Running on deployed site, using redirect URL:", apiUrl);
-        }
-
-        console.log("Using API URL:", apiUrl);
-
-        const response = await fetch(apiUrl, {
+        const response = await fetch(`${API_URL}/users/register`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: nameInput.value,
+            email: emailInput.value,
+            phone: phoneInput.value,
+            password: passwordInput.value,
+          }),
         });
+
+        if (!response.ok) {
+          throw new Error("Registration failed");
+        }
 
         const data = await response.json();
+        localStorage.setItem("brewAndClayUser", JSON.stringify(data));
 
-        if (response.ok) {
-          // Store user data and token in localStorage
-          localStorage.setItem(
-            "brewAndClayUser",
-            JSON.stringify({
-              name: data.name,
-              email: data.email,
-              phone: data.phone,
-              token: data.token,
-            })
-          );
-
-          console.log("User data saved to localStorage");
-          console.log("Redirecting to Home.html");
-
-          // Redirect to home page
-          window.location.href = "/Html/Home.html";
-        } else {
-          throw new Error(data.message || "Registration failed");
-        }
+        console.log("Signup successful, redirecting...");
+        window.location.href = "/Html/Home.html";
       } catch (error) {
-        console.error("Registration error:", error);
-
-        // Log detailed error information for debugging
-        console.log("Error details:", {
-          message: error.message,
-          stack: error.stack,
-          url: window.location.href,
-          userAgent: navigator.userAgent,
-        });
-
+        console.error("Signup error:", error);
         alert(
-          error.message ||
-            "An error occurred during registration. Please try again."
+          error.message || "An error occurred during signup. Please try again."
         );
       }
     } else {
