@@ -6,7 +6,7 @@
     "scripts": {
         "start": "node server.js",
         "dev": "nodemon server.js",
-        "build": "mkdir -p dist/css dist/js && cp -r index.html about.html Html Material MugImages dist/ && cp -r js/* dist/js/ && cp -r css/* dist/css/"
+        "build": "node -e \"process.platform === 'win32' ? require('child_process').execSync('build.bat', {stdio: 'inherit'}) : require('child_process').execSync('bash build.sh', {stdio: 'inherit'})\""
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",
