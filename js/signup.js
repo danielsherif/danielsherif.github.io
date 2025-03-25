@@ -1,5 +1,5 @@
 // Client-side validation and authentication for signup form
-const API_URL = "/api";
+const API_URL = "https://sweet-cobbler-5c0ef9.netlify.app/api";
 document.addEventListener("DOMContentLoaded", function () {
   const signupForm = document.getElementById("signup-form");
   const nameInput = document.getElementById("name");

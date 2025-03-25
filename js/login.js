@@ -1,5 +1,5 @@
 // Client-side validation and authentication for login form
-const API_URL = "/api";
+const API_URL = "https://sweet-cobbler-5c0ef9.netlify.app/api";
 
 document.addEventListener("DOMContentLoaded", function () {
   const loginForm = document.getElementById("login-form");

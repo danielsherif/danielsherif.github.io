@@ -1,11 +1,9 @@
 [build]
   command = "npm run build"
   publish = "dist"
-  functions = "netlify/functions" # Correct: Relative path from root
+  functions = "netlify/functions"
 
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
-  status = 200 # Use 200 to proxy the request
-  # force = true # Only if absolutely necessary
-  # Remove headers - let the function handle CORS
+  status = 200
