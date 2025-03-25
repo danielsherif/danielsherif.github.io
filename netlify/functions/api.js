@@ -14,7 +14,7 @@ const app = express();
 async function connectToDatabase() {
   // Check if already connected or connecting
   if (mongoose.connection.readyState >= 1) {
-    console.log("Database already connected.");
+    // console.log("Database already connected."); // Optional: Reduce noise in logs
     return;
   }
   try {
@@ -22,44 +22,41 @@ async function connectToDatabase() {
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      // Consider adding serverSelectionTimeoutMS for better error handling on connect
-      // serverSelectionTimeoutMS: 5000,
+      // serverSelectionTimeoutMS: 5000, // Optional: For faster connection timeout detection
     });
     console.log("Database connected successfully.");
   } catch (error) {
     console.error("Database connection error:", error);
-    // Rethrow or handle appropriately - maybe prevent server start?
-    // In a serverless context, subsequent requests might fail if DB is needed.
-    throw error; // Rethrowing might cause function invocation to fail, which is often desired
+    throw error;
   }
 }
 
 // --- CORS Configuration ---
 const corsOptions = {
-  // Ensure your production frontend URL is correct and doesn't end with a slash unless intended
+  // Ensure your production frontend URL is correct
   origin: [
     "https://brewandclay.me",
     "https://sweet-cobbler-5c0ef9.netlify.app", // Your Netlify frontend URL
-    "http://localhost:3000", // Common React dev port
-    "http://localhost:8080", // Your apparent local frontend port
-    "http://127.0.0.1:8080", // Explicit localhost IP
+    "http://localhost:3000",
+    "http://localhost:8080", // Your local frontend port
+    "http://127.0.0.1:8080",
   ],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-  allowedHeaders: "Content-Type,Authorization", // Only allow necessary headers
+  allowedHeaders: "Content-Type,Authorization",
   credentials: true,
-  optionsSuccessStatus: 204, // Standard for OPTIONS preflight success
+  optionsSuccessStatus: 204,
 };
 
 // --- Middleware Setup ---
-// 1. Apply CORS Middleware FIRST - Handles OPTIONS preflight automatically
+// 1. Apply CORS Middleware FIRST
 app.use(cors(corsOptions));
 
 // 2. Parse JSON request bodies AFTER CORS
 app.use(express.json());
 
-// 3. Basic Request Logger (Optional but helpful)
+// 3. Basic Request Logger (Shows path *after* serverless-http mapping)
 app.use((req, res, next) => {
-  console.log(`Incoming Request: ${req.method} ${req.path}`);
+  console.log(`Function Request: ${req.method} ${req.path}`); // req.path will NOT have /api/ prefix here
   next();
 });
 
@@ -74,7 +71,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
   },
   phone: { type: String, required: true, trim: true },
-  password: { type: String, required: true, select: false }, // Keep password hidden by default
+  password: { type: String, required: true, select: false },
   createdAt: { type: Date, default: Date.now },
 });
 
@@ -86,7 +83,7 @@ userSchema.pre("save", async function (next) {
     next();
   } catch (error) {
     console.error("Error hashing password:", error);
-    next(error); // Pass error to Express error handler
+    next(error);
   }
 });
 
@@ -98,73 +95,61 @@ userSchema.methods.correctPassword = async function (
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-// Register model, handling potential hot-reloading issues
+// Register model
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 // --- JWT Generation ---
 const generateToken = (userId) => {
   if (!process.env.JWT_SECRET) {
     console.error("FATAL ERROR: JWT_SECRET is not defined.");
-    // In a real app, you might want to prevent startup or throw a more specific error
-    return null; // Or throw an error
+    return null;
   }
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: "30d", // Consider a shorter duration for production
+    expiresIn: "30d",
   });
 };
 
 // --- API Routes ---
+// IMPORTANT: Routes defined here do NOT include the /api prefix.
+// The Netlify redirect handles the /api part.
 
-// Base route for testing if the API function is reachable
-app.get("/api/", (req, res) => {
-  console.log("Request received for ROOT /api/ path");
+// Base route (matches requests to /api/ because of redirect)
+app.get("/", (req, res) => {
+  console.log("Request received for ROOT path '/' within function");
   res.status(200).json({ message: "Brew & Clay API is active!" });
 });
 
-// Register User Route
-// Note: The path will be accessible via /api/users/register due to Netlify redirect
-app.post("/api/users/register", async (req, res, next) => {
-  // Added next for error handling
-  console.log("Attempting user registration for:", req.body.email);
+// Register User Route (matches requests to /api/users/register)
+app.post("/users/register", async (req, res, next) => {
+  console.log("Handling registration for:", req.body.email);
   try {
-    await connectToDatabase(); // Ensure DB connection
+    await connectToDatabase();
     const { name, email, phone, password } = req.body;
 
     if (!name || !email || !phone || !password) {
-      console.log("Registration failed: Missing required fields");
-      return res
-        .status(400)
-        .json({
-          message: "All fields (name, email, phone, password) are required",
-        });
+      console.log("Registration failed: Missing fields");
+      return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Basic email validation (consider a more robust library like validator)
     if (!/\S+@\S+\.\S+/.test(email)) {
       console.log("Registration failed: Invalid email format");
       return res.status(400).json({ message: "Invalid email format" });
     }
+    // You could add phone validation here too if desired
 
     const userExists = await User.findOne({ email });
     if (userExists) {
-      console.log(
-        "Registration failed: User already exists with email:",
-        email
-      );
-      return res
-        .status(400)
-        .json({ message: "User already exists with this email" });
+      console.log("Registration failed: User exists:", email);
+      return res.status(400).json({ message: "User already exists" });
     }
 
-    const newUser = await User.create({ name, email, phone, password }); // Password will be hashed by pre-save hook
-
-    // Don't send password back, even hashed
+    const newUser = await User.create({ name, email, phone, password });
     const token = generateToken(newUser._id);
+
     if (!token) {
-      // Handle error if JWT secret was missing
       return res
         .status(500)
-        .json({ message: "Could not generate authentication token." });
+        .json({ message: "Could not generate auth token." });
     }
 
     console.log("User registered successfully:", newUser.email);
@@ -177,49 +162,44 @@ app.post("/api/users/register", async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error during user registration:", error);
-    next(error); // Pass error to the global error handler
+    next(error);
   }
 });
 
-// Login User Route
-// Note: The path will be accessible via /api/users/login
-app.post("/api/users/login", async (req, res, next) => {
-  // Added next
-  console.log("Attempting user login for:", req.body.email);
+// Login User Route (matches requests to /api/users/login)
+app.post("/users/login", async (req, res, next) => {
+  console.log("Handling login for:", req.body.email);
   try {
-    await connectToDatabase(); // Ensure DB connection
+    await connectToDatabase();
     const { email, password } = req.body;
 
     if (!email || !password) {
-      console.log("Login failed: Email or password missing");
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
+      console.log("Login failed: Missing fields");
+      return res.status(400).json({ message: "Email and password required" });
     }
 
-    const user = await User.findOne({ email }).select("+password"); // Explicitly request password
+    const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
-      console.log("Login failed: No user found with email:", email);
-      return res.status(401).json({ message: "Invalid email or password" }); // Generic message for security
+      console.log("Login failed: User not found:", email);
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const isMatch = await user.correctPassword(password, user.password);
 
     if (!isMatch) {
-      console.log("Login failed: Password incorrect for email:", email);
-      return res.status(401).json({ message: "Invalid email or password" }); // Generic message
+      console.log("Login failed: Password incorrect for:", email);
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const token = generateToken(user._id);
     if (!token) {
       return res
         .status(500)
-        .json({ message: "Could not generate authentication token." });
+        .json({ message: "Could not generate auth token." });
     }
 
     console.log("User logged in successfully:", user.email);
-    // Send back user data (without password) and token
     res.json({
       _id: user._id,
       name: user.name,
@@ -229,33 +209,29 @@ app.post("/api/users/login", async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error during user login:", error);
-    next(error); // Pass error to the global error handler
+    next(error);
   }
 });
 
 // --- Catch-All for Routes Not Found in Express App ---
-// This will handle requests for paths like /api/nonexistentroute
-// It should come AFTER all your valid routes
+// This handles requests like /api/nonexistent where '/nonexistent' doesn't match any route above
 app.use((req, res, next) => {
-  console.log(`404 Not Found for path: ${req.originalUrl}`); // Use originalUrl to see the full path requested
+  // Note: req.originalUrl might still show /api/nonexistent, while req.path would be /nonexistent
+  console.log(
+    `404 Function Route Not Found for path: ${req.path} (Original: ${req.originalUrl})`
+  );
   res
     .status(404)
-    .json({ error: "Not Found - The requested API endpoint does not exist." });
+    .json({ error: "Not Found - The requested API sub-path does not exist." });
 });
 
 // --- Global Error Handler ---
-// Must have 4 arguments (err, req, res, next) to be recognized by Express
-// This should be the VERY LAST `app.use()` call
 app.use((err, req, res, next) => {
-  console.error("Unhandled Error:", err.stack || err); // Log the full error stack
-  // Avoid sending detailed error messages in production for security
+  console.error("Global Error Handler Caught:", err.stack || err);
   res.status(err.status || 500).json({
     message: err.message || "Internal Server Error",
-    // Optionally include error code or type in development
-    // errorType: process.env.NODE_ENV === 'development' ? err.name : undefined,
   });
 });
 
 // --- Export the handler for Netlify Functions ---
-// The path mapping is handled by serverless-http and Netlify redirects
 exports.handler = serverless(app);
