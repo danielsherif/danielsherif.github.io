@@ -9,3 +9,5 @@ if exist Material xcopy Material dist\ /E /I /Y
 if exist MugImages xcopy MugImages dist\ /E /I /Y
 if exist js xcopy js dist\js\ /E /I /Y
 if exist css xcopy css dist\css\ /E /I /Y
+
+echo Build script completed successfully.
