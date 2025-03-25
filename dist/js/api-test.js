@@ -17,10 +17,15 @@ document.addEventListener("DOMContentLoaded", function () {
         <h2 class="text-xl font-semibold mb-2">Test Configuration</h2>
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-bold mb-2" for="base-url">
-            API Base URL
+            API Base URL Format
           </label>
-          <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-            id="base-url" type="text" value="https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api">
+          <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+            id="url-format">
+            <option value="netlify-functions">/.netlify/functions/api (Standard)</option>
+            <option value="api-redirect">/api (Redirect Rule)</option>
+            <option value="absolute-netlify-functions">https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api (Absolute Standard)</option>
+            <option value="absolute-api-redirect">https://sweet-cobbler-5c0ef9.netlify.app/api (Absolute Redirect)</option>
+          </select>
         </div>
       </div>
       
@@ -33,8 +38,8 @@ document.addEventListener("DOMContentLoaded", function () {
           <button id="test-login" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
             Test Login Endpoint
           </button>
-          <button id="test-relative" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
-            Test Relative URL
+          <button id="test-options" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
+            Test OPTIONS Preflight
           </button>
         </div>
       </div>
@@ -51,10 +56,10 @@ document.addEventListener("DOMContentLoaded", function () {
   document.body.appendChild(container);
 
   // Get elements
-  const baseUrlInput = document.getElementById("base-url");
+  const urlFormatSelect = document.getElementById("url-format");
   const testRegisterBtn = document.getElementById("test-register");
   const testLoginBtn = document.getElementById("test-login");
-  const testRelativeBtn = document.getElementById("test-relative");
+  const testOptionsBtn = document.getElementById("test-options");
   const resultsDiv = document.getElementById("results");
 
   // Helper function to log results
@@ -66,20 +71,51 @@ document.addEventListener("DOMContentLoaded", function () {
     resultsDiv.scrollTop = resultsDiv.scrollHeight;
   }
 
+  // Helper function to get the API URL based on selected format
+  function getApiUrl(endpoint) {
+    const format = urlFormatSelect.value;
+    let baseUrl = "";
+
+    switch (format) {
+      case "netlify-functions":
+        baseUrl = "/.netlify/functions/api";
+        break;
+      case "api-redirect":
+        baseUrl = "/api";
+        break;
+      case "absolute-netlify-functions":
+        baseUrl =
+          "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api";
+        break;
+      case "absolute-api-redirect":
+        baseUrl = "https://sweet-cobbler-5c0ef9.netlify.app/api";
+        break;
+      default:
+        baseUrl = "/.netlify/functions/api";
+    }
+
+    return `${baseUrl}${endpoint}`;
+  }
+
   // Helper function to test an endpoint
   async function testEndpoint(endpoint, method, data = null) {
-    logResult(`Testing ${method} ${endpoint}...`);
+    const fullUrl = getApiUrl(endpoint);
+    logResult(`Testing ${method} ${fullUrl}...`);
 
     try {
       const options = {
         method: method,
         headers: {
-          "Content-Type": "application/json",
           Origin: window.location.origin,
         },
       };
 
-      if (data) {
+      // Add Content-Type header only for non-OPTIONS requests with body
+      if (method !== "OPTIONS" && data) {
+        options.headers["Content-Type"] = "application/json";
+      }
+
+      if (data && method !== "OPTIONS") {
         options.body = JSON.stringify(data);
       }
 
@@ -129,8 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Test registration endpoint
   testRegisterBtn.addEventListener("click", async () => {
-    const baseUrl = baseUrlInput.value.trim();
-    const endpoint = `${baseUrl}/users/register`;
+    const endpoint = "/users/register";
 
     const testData = {
       name: "Test User",
@@ -144,8 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Test login endpoint
   testLoginBtn.addEventListener("click", async () => {
-    const baseUrl = baseUrlInput.value.trim();
-    const endpoint = `${baseUrl}/users/login`;
+    const endpoint = "/users/login";
 
     const testData = {
       email: "test@example.com",
@@ -155,25 +189,24 @@ document.addEventListener("DOMContentLoaded", function () {
     await testEndpoint(endpoint, "POST", testData);
   });
 
-  // Test relative URL
-  testRelativeBtn.addEventListener("click", async () => {
-    const endpoint = "/api/users/register";
+  // Test OPTIONS preflight request
+  testOptionsBtn.addEventListener("click", async () => {
+    const endpoint = "/users/login";
 
-    const testData = {
-      name: "Test User",
-      email: `test${Date.now()}@example.com`,
-      phone: "01012345678",
-      password: "password123",
-    };
+    logResult(`Testing OPTIONS preflight request to ${getApiUrl(endpoint)}`);
+    logResult(`This tests if CORS preflight is properly configured`);
 
-    logResult(`Testing relative URL: ${endpoint}`);
-    logResult(`This tests if the netlify.toml redirect is working properly`);
-
-    await testEndpoint(endpoint, "POST", testData);
+    await testEndpoint(endpoint, "OPTIONS");
   });
 
   // Initial log
-  logResult("API Test Tool loaded. Click a button to test endpoints.");
+  logResult(
+    "Enhanced API Test Tool loaded. Select a URL format and click a button to test endpoints."
+  );
   logResult(`Current origin: ${window.location.origin}`);
   logResult(`User agent: ${navigator.userAgent}`);
+  logResult(
+    `Select different URL formats to identify which one works correctly.`
+  );
+  logResult(`The OPTIONS test can help diagnose CORS preflight issues.`);
 });

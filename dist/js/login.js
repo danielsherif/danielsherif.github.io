@@ -1,4 +1,7 @@
 // Client-side validation and authentication for login form
+const API_URL =
+  "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api";
+
 document.addEventListener("DOMContentLoaded", function () {
   const loginForm = document.getElementById("login-form");
   const emailInput = document.getElementById("email");
@@ -31,14 +34,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Email validation on blur
   emailInput.addEventListener("blur", function () {
-    const isValid = validateEmail(emailInput.value);
-    showError(emailInput, emailError, isValid);
+    showError(emailInput, emailError, validateEmail(emailInput.value));
   });
 
   // Password validation on blur
   passwordInput.addEventListener("blur", function () {
-    const isValid = validatePassword(passwordInput.value);
-    showError(passwordInput, passwordError, isValid);
+    showError(
+      passwordInput,
+      passwordError,
+      validatePassword(passwordInput.value)
+    );
   });
 
   // Form submission
@@ -46,7 +51,6 @@ document.addEventListener("DOMContentLoaded", function () {
     e.preventDefault();
 
     console.log("Login form submission started");
-    console.log("Current URL:", window.location.href);
 
     // Validate all fields
     const isEmailValid = showError(
@@ -60,90 +64,30 @@ document.addEventListener("DOMContentLoaded", function () {
       validatePassword(passwordInput.value)
     );
 
-    console.log("Validation results:", {
-      isEmailValid,
-      isPasswordValid,
-    });
-
-    // If all validations pass
     if (isEmailValid && isPasswordValid) {
       try {
-        console.log("All validations passed, preparing to send API request");
+        console.log("Sending login request...");
 
-        const requestData = {
-          email: emailInput.value,
-          password: passwordInput.value,
-        };
-
-        console.log("Request payload:", JSON.stringify(requestData));
-        console.log("Request method: POST");
-        console.log("Request headers: Content-Type: application/json");
-
-        // Determine the appropriate API URL based on the current environment
-        let apiUrl;
-
-        // Check if we're running locally (file://) or on the production site
-        if (window.location.protocol === "file:") {
-          // When running locally, use the absolute URL with .netlify/functions path
-          apiUrl =
-            "https://sweet-cobbler-5c0ef9.netlify.app/.netlify/functions/api/users/login";
-          console.log("Running locally, using absolute URL:", apiUrl);
-        } else if (
-          window.location.hostname === "localhost" ||
-          window.location.hostname === "127.0.0.1"
-        ) {
-          // When running on localhost server
-          apiUrl = "/.netlify/functions/api/users/login";
-          console.log(
-            "Running on localhost server, using relative URL:",
-            apiUrl
-          );
-        } else {
-          // When running on the deployed site, use the redirect rule
-          apiUrl = "/api/users/login";
-          console.log("Running on deployed site, using redirect URL:", apiUrl);
-        }
-
-        console.log("Using API URL:", apiUrl);
-
-        const response = await fetch(apiUrl, {
+        const response = await fetch(`${API_URL}/users/login`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: emailInput.value,
+            password: passwordInput.value,
+          }),
         });
+
+        if (!response.ok) {
+          throw new Error("Invalid login credentials");
+        }
 
         const data = await response.json();
+        localStorage.setItem("brewAndClayUser", JSON.stringify(data));
 
-        if (response.ok) {
-          // Store user data and token in localStorage
-          localStorage.setItem(
-            "brewAndClayUser",
-            JSON.stringify({
-              name: data.name,
-              email: data.email,
-              phone: data.phone,
-              token: data.token,
-            })
-          );
-
-          // Redirect to home page
-          window.location.href = "/Html/Home.html";
-        } else {
-          throw new Error(data.message || "Authentication failed");
-        }
+        console.log("Login successful, redirecting...");
+        window.location.href = "/Html/Home.html";
       } catch (error) {
         console.error("Login error:", error);
-
-        // Log detailed error information for debugging
-        console.log("Error details:", {
-          message: error.message,
-          stack: error.stack,
-          url: window.location.href,
-          userAgent: navigator.userAgent,
-        });
-
         alert(
           error.message || "An error occurred during login. Please try again."
         );
