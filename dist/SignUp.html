@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brew and Clay - Artisan Mugs for Modern Living</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.6.0/css/glide.core.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.6.0/css/glide.theme.min.css" rel="stylesheet" />
+    <link href="https://ai-public.creatie.ai/gen_page/tailwind-custom.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.6.0/glide.min.js"></script>
+    <script
+        src="https://cdn.tailwindcss.com/3.4.5?plugins=forms@0.5.7,typography@0.5.13,aspect-ratio@0.4.2,container-queries@0.1.1"></script>
+    <script src="https://ai-public.creatie.ai/gen_page/tailwind-config.min.js" data-color="#0E3D39"
+        data-border-radius="medium"></script>
+</head>
+
+<body class="font-[&#39;DM_Sans&#39;] bg-gray-50">
+    <header class="fixed w-full bg-white shadow-sm z-50">
+        <nav class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex-shrink-0">
+                        <img class="h-8 w-auto" src="../Material/TextAndEmblem.png" alt="Brew and Clay" />
+                    </a>
+                    <div class="hidden md:ml-6 md:flex md:space-x-8">
+                        <a href="Home.html"
+                            class="text-gray-500 hover:text-custom px-1 inline-flex items-center h-full text-sm font-medium">Home</a>
+                        <a href="AllProducts.html"
+                            class="text-gray-500 hover:text-custom px-1 inline-flex items-center h-full text-sm font-medium">Shop</a>
+                        <a href="Collections.html"
+                            class="text-gray-500 hover:text-custom px-1 inline-flex items-center h-full text-sm font-medium">Collections</a>
+                        <a href="AboutUs.html"
+                            class="text-gray-500 hover:text-custom px-1 inline-flex items-center h-full text-sm font-medium">About</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="relative">
+                            <input type="text" placeholder="Search products..."
+                                class="w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-button focus:outline-none focus:border-custom" />
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hidden md:ml-4 md:flex md:items-center md:space-x-4">
+                        <button class="p-2 text-gray-500 hover:text-custom">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <button class="p-2 text-gray-500 hover:text-custom">
+                            <i class="far fa-user"></i>
+                        </button>
+                        <button class="p-2 text-gray-500 hover:text-custom relative">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span
+                                class="absolute -top-1 -right-1 bg-custom text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="pt-16">
+        <section
+            class="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-md w-full space-y-8">
+                <div class="text-center">
+                    <h2 class="text-4xl font-bold text-gray-900 mb-2">Create an Account</h2>
+                    <p class="text-gray-600">Join Brew and Clay to start your artisan journey</p>
+                </div>
+                <form id="signup-form" class="mt-8 space-y-6">
+                    <div class="space-y-4 rounded-md">
+                        <div class="relative">
+                            <label for="name" class="sr-only">Full Name</label>
+                            <input id="name" name="name" type="text" required
+                                class="appearance-none rounded-button relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-custom focus:border-custom"
+                                placeholder="Full Name" />
+                            <p class="text-xs text-gray-500 mt-1 ml-1">Your full name</p>
+                            <p id="name-error" class="text-xs text-red-500 mt-1 ml-1 hidden">Name is required</p>
+                        </div>
+                        <div class="relative">
+                            <label for="email" class="sr-only">Email address</label>
+                            <input id="email" name="email" type="email" required
+                                class="appearance-none rounded-button relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-custom focus:border-custom"
+                                placeholder="Email address" />
+                            <p class="text-xs text-gray-500 mt-1 ml-1">Example: yourmail@mail.com</p>
+                            <p id="email-error" class="text-xs text-red-500 mt-1 ml-1 hidden">Please enter a valid email
+                                address</p>
+                        </div>
+                        <div class="relative">
+                            <label for="phone" class="sr-only">Phone Number</label>
+                            <input id="phone" name="phone" type="tel" required
+                                class="appearance-none rounded-button relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-custom focus:border-custom"
+                                placeholder="Phone Number" />
+                            <p class="text-xs text-gray-500 mt-1 ml-1">Format: 01XXXXXXXXX</p>
+                            <p id="phone-error" class="text-xs text-red-500 mt-1 ml-1 hidden">Phone number must be in
+                                format 01XXXXXXXXX</p>
+                        </div>
+                        <div class="relative">
+                            <label for="password" class="sr-only">Password</label>
+                            <input id="password" name="password" type="password" required
+                                class="appearance-none rounded-button relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-custom focus:border-custom"
+                                placeholder="Password" />
+                            <p class="text-xs text-gray-500 mt-1 ml-1">Must be at least 8 characters</p>
+                            <p id="password-error" class="text-xs text-red-500 mt-1 ml-1 hidden">Password must be at
+                                least 8 characters</p>
+                        </div>
+                        <div class="relative">
+                            <label for="confirm-password" class="sr-only">Confirm Password</label>
+                            <input id="confirm-password" name="confirm-password" type="password" required
+                                class="appearance-none rounded-button relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-custom focus:border-custom"
+                                placeholder="Confirm Password" />
+                            <p class="text-xs text-gray-500 mt-1 ml-1">Re-enter your password</p>
+                            <p id="confirm-password-error" class="text-xs text-red-500 mt-1 ml-1 hidden">Passwords do
+                                not match</p>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="submit"
+                            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-button text-white bg-custom hover:bg-custom/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom">
+                            Sign up
+                        </button>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-600">Already have an account? <a href="Login.html"
+                                class="font-medium text-custom hover:text-custom/90">Sign in</a></p>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900">
+        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <img class="h-8 w-auto" src="https://ai-public.creatie.ai/gen_page/logo_placeholder.png"
+                        alt="Brew and Clay" />
+                    <p class="mt-4 text-gray-400">Artisan mugs for modern living. Handcrafted with care and attention to
+                        detail.</p>
+                </div>
+                <div>
+                    <h3 class="text-white font-medium mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">FAQ</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Shipping</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white font-medium mb-4">Collections</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Minimalist Series</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Artistic Collection</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Limited Editions</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">New Arrivals</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white font-medium mb-4">Newsletter</h3>
+                    <p class="text-gray-400 mb-4">Subscribe to receive updates, access to exclusive deals, and more.</p>
+                    <form class="flex">
+                        <input type="email" placeholder="Enter your email"
+                            class="!rounded-button flex-1 px-4 py-2 text-gray-900" />
+                        <button type="submit"
+                            class="!rounded-button ml-2 bg-custom text-white px-4 py-2 hover:bg-custom/90">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-800">
+                <p class="text-center text-gray-400">© 2024 Brew and Clay. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="../js/database.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/mobile.js"></script>
+    <script src="../js/signup.js"></script>
+
+    <script>
+        new Glide('.glide', {
+            type: 'carousel',
+            startAt: 0,
+            perView: 3,
+            gap: 32,
+            breakpoints: {
+                768: {
+                    perView: 1
+                }
+            },
+            autoplay: 3000
+        }).mount();
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>

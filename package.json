@@ -6,7 +6,7 @@
     "scripts": {
         "start": "node server.js",
         "dev": "nodemon server.js",
-        "build": "mkdir -p dist/css dist/js && cp -r index.html about.html Html Material MugImages dist/ && cp -r js/* dist/js/ 2>/dev/null || true && cp -r css/* dist/css/ 2>/dev/null || true"
+        "build": "(if not exist dist mkdir dist) && (if not exist dist\\css mkdir dist\\css) && (if not exist dist\\js mkdir dist\\js) && xcopy index.html dist\\ /Y && xcopy about.html dist\\ /Y && xcopy Html dist\\ /E /I /Y && xcopy Material dist\\ /E /I /Y && xcopy MugImages dist\\ /E /I /Y && xcopy js dist\\js\\ /E /I /Y && xcopy css dist\\css\\ /E /I /Y"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",
