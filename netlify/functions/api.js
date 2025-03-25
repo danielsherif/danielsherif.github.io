@@ -75,7 +75,7 @@ const generateToken = (userId) =>
   jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "30d" });
 
 // ✅ Register User Route
-app.post("/users/register", async (req, res) => {
+app.post("/api/users/register", async (req, res) => {
   await connectToDatabase();
   const { name, email, phone, password } = req.body;
 
@@ -98,7 +98,7 @@ app.post("/users/register", async (req, res) => {
 });
 
 // ✅ Login User Route
-app.post("/users/login", async (req, res) => {
+app.post("/api/users/login", async (req, res) => {
   await connectToDatabase();
   const { email, password } = req.body;
 
