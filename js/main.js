@@ -10,7 +10,7 @@ const BrewAndClay = (function () {
     const savedCart = sessionStorage.getItem("brewAndClayCart");
     if (savedCart) {
       try {
-        cart = JSON.parse(savedCart);
+        cart = JSON.parse(savedCart) || [];
         console.log("Cart loaded from session storage:", cart);
         updateCartCounter();
       } catch (e) {
