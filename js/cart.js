@@ -136,9 +136,14 @@ const BrewAndClayCart = (function () {
 
   // Add item to cart
   const addToCart = (product) => {
-    // Get quantity from input if available
-    const quantityInput = document.querySelector(".quantity-input");
-    const quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
+    // Get quantity from product object or input if available
+    let quantity = product.quantity || 1;
+
+    // If quantity not in product object, try to get from input
+    if (!product.quantity) {
+      const quantityInput = document.querySelector(".quantity-input");
+      quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
+    }
 
     // Check if product already exists in cart
     const existingItemIndex = cart.findIndex((item) => item.id === product.id);
@@ -260,6 +265,12 @@ const BrewAndClayCart = (function () {
       button.addEventListener("click", function () {
         const productCard = this.closest(".product-card");
         if (productCard) {
+          // Get quantity from input if available (for product cards that might have quantity inputs)
+          const quantityInput = productCard.querySelector(".quantity-input");
+          const quantity = quantityInput
+            ? parseInt(quantityInput.value) || 1
+            : 1;
+
           const product = {
             id: productCard.dataset.productId,
             name: productCard.querySelector(".product-name").textContent,
@@ -269,6 +280,7 @@ const BrewAndClayCart = (function () {
                 .textContent.replace("EGP ", "")
             ),
             image: productCard.querySelector(".product-image").src,
+            quantity: quantity, // Add quantity to the product object
           };
 
           addToCart(product);
@@ -290,11 +302,18 @@ const BrewAndClayCart = (function () {
           );
 
           if (productId && productName && productPrice && productImage) {
+            // Get quantity from input if available
+            const quantityInput = document.querySelector(".quantity-input");
+            const quantity = quantityInput
+              ? parseInt(quantityInput.value) || 1
+              : 1;
+
             const product = {
               id: productId,
               name: productName,
               price: productPrice,
               image: productImage,
+              quantity: quantity, // Add quantity to the product object
             };
 
             addToCart(product);
