@@ -1,7 +1,7 @@
 // Brew & Clay - Wishlist Module
 
-// Define API URL if not already defined
-const API_URL = API_URL || "https://sweet-cobbler-5c0ef9.netlify.app/api";
+// Define API URL
+const API_URL = "https://sweet-cobbler-5c0ef9.netlify.app/api";
 
 const BrewAndClayWishlist = (function () {
   // Private variables
