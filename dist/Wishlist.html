@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Brew and Clay - Login</title>
+    <title>Brew and Clay - Wishlist</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.6.0/css/glide.core.min.css" rel="stylesheet" />
@@ -47,10 +47,10 @@
                         </div>
                     </div>
                     <div class="hidden md:ml-4 md:flex md:items-center md:space-x-4">
-                        <a href="Wishlist.html" class="p-2 text-gray-500 hover:text-custom">
+                        <a href="Wishlist.html" class="p-2 text-custom hover:text-custom">
                             <i class="far fa-heart"></i>
                         </a>
-                        <a href="Login.html" class="p-2 text-custom hover:text-custom">
+                        <a href="Login.html" class="p-2 text-gray-500 hover:text-custom">
                             <i class="far fa-user"></i>
                         </a>
                         <a href="Cart.html" class="p-2 text-gray-500 hover:text-custom relative">
@@ -65,57 +65,60 @@
     </header>
 
     <main class="pt-16">
-        <section
-            class="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
-            <div class="max-w-md w-full space-y-8">
-                <div class="text-center">
-                    <h2 class="text-4xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-                    <p class="text-gray-600">Sign in to your Brew and Clay account</p>
+        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-16">
+            <h1 class="text-3xl font-bold text-gray-900 mb-8">My Wishlist</h1>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-3">
+                    <div class="bg-white rounded-lg shadow-sm">
+                        <div class="p-6 space-y-6">
+                            <!-- Empty wishlist message -->
+                            <div id="empty-wishlist" class="text-center py-12">
+                                <i class="far fa-heart text-5xl text-gray-300 mb-4"></i>
+                                <h2 class="text-xl font-medium text-gray-900 mb-2">Your wishlist is empty</h2>
+                                <p class="text-gray-500 mb-6">Save items you love to your wishlist and review them
+                                    anytime.</p>
+                                <a href="AllProducts.html"
+                                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium text-white bg-custom hover:bg-custom/90 rounded-button">
+                                    Continue Shopping
+                                    <i class="fas fa-arrow-right ml-2"></i>
+                                </a>
+                            </div>
+
+                            <!-- Wishlist items will be dynamically rendered here by JavaScript -->
+                            <div id="wishlist-items" class="hidden">
+                                <!-- Sample wishlist item (will be replaced by dynamic content) -->
+                                <div
+                                    class="flex flex-col md:flex-row border-b border-gray-200 pb-6 mb-6 last:border-0 last:pb-0 last:mb-0">
+                                    <div class="md:w-1/4 mb-4 md:mb-0">
+                                        <img src="../MugImages/1.png" alt="Classic White Mug"
+                                            class="w-full h-auto rounded-lg" />
+                                    </div>
+                                    <div class="md:w-3/4 md:pl-6 flex flex-col">
+                                        <div class="flex justify-between mb-2">
+                                            <h3 class="text-lg font-medium text-gray-900">Classic White Mug</h3>
+                                            <button class="text-gray-400 hover:text-red-500">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                        <p class="text-gray-500 mb-4">Minimalist design</p>
+                                        <div
+                                            class="mt-auto flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                                            <span class="text-lg font-medium text-custom mb-4 sm:mb-0">EGP 774.69</span>
+                                            <div class="flex space-x-2">
+                                                <button
+                                                    class="bg-custom text-white py-2 px-4 rounded-button hover:bg-custom/90">
+                                                    Add to Cart
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <form id="login-form" class="mt-8 space-y-6">
-                    <div class="space-y-4 rounded-md">
-                        <div class="relative">
-                            <label for="email" class="sr-only">Email address</label>
-                            <input id="email" name="email" type="email" required
-                                class="appearance-none rounded-button relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-custom focus:border-custom"
-                                placeholder="Email address" />
-                            <p class="text-xs text-gray-500 mt-1 ml-1">Example: yourmail@mail.com</p>
-                            <p id="email-error" class="text-xs text-red-500 mt-1 ml-1 hidden">Please enter a valid email
-                                address</p>
-                        </div>
-                        <div class="relative">
-                            <label for="password" class="sr-only">Password</label>
-                            <input id="password" name="password" type="password" required
-                                class="appearance-none rounded-button relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-custom focus:border-custom"
-                                placeholder="Password" />
-                            <p class="text-xs text-gray-500 mt-1 ml-1">Must be at least 8 characters</p>
-                            <p id="password-error" class="text-xs text-red-500 mt-1 ml-1 hidden">Password must be at
-                                least 8 characters</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <input id="remember-me" name="remember-me" type="checkbox"
-                                class="h-4 w-4 text-custom focus:ring-custom border-gray-300 rounded" />
-                            <label for="remember-me" class="ml-2 block text-sm text-gray-900">Remember me</label>
-                        </div>
-                        <div class="text-sm">
-                            <a href="#" class="font-medium text-custom hover:text-custom/90">Forgot your password?</a>
-                        </div>
-                    </div>
-                    <div>
-                        <button type="submit"
-                            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-button text-white bg-custom hover:bg-custom/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom">
-                            Sign in
-                        </button>
-                    </div>
-                    <div class="text-center">
-                        <p class="text-sm text-gray-600">Don't have an account? <a href="SignUp.html"
-                                class="font-medium text-custom hover:text-custom/90">Sign up</a></p>
-                    </div>
-                </form>
             </div>
-        </section>
+        </div>
     </main>
 
     <footer class="bg-gray-900">
@@ -129,7 +132,7 @@
                 <div>
                     <h3 class="text-white font-medium mb-4">Quick Links</h3>
                     <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li><a href="AboutUs.html" class="text-gray-400 hover:text-white">About Us</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-white">FAQ</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-white">Shipping</a></li>
@@ -162,11 +165,12 @@
             </div>
         </div>
     </footer>
+
     <script src="../js/database.js"></script>
     <script src="../js/main.js"></script>
     <script src="../js/ui.js"></script>
     <script src="../js/mobile.js"></script>
-    <script src="../js/login.js"></script>
+    <script src="../js/wishlist.js"></script>
 </body>
 
 </html>

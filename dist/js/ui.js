@@ -1162,9 +1162,9 @@ const BrewAndClayUI = (function () {
           ".flex.justify-between:nth-child(2) .font-medium.text-gray-900"
         );
         let shipping = 65.0; // Fixed shipping cost of EGP 65.00
-        if (shippingElement) {
-          shippingElement.textContent = `EGP ${shipping.toFixed(2)}`;
-        }
+        // if (shippingElement) {
+        //   shippingElement.textContent = `EGP ${shipping.toFixed(2)}`;
+        // }
         const total = subtotal + shipping;
 
         // Update total

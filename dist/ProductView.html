@@ -15,6 +15,10 @@
         src="https://cdn.tailwindcss.com/3.4.5?plugins=forms@0.5.7,typography@0.5.13,aspect-ratio@0.4.2,container-queries@0.1.1"></script>
     <script src="https://ai-public.creatie.ai/gen_page/tailwind-config.min.js" data-color="#0E3D39"
         data-border-radius="medium"></script>
+    <script src="../js/database.js" defer></script>
+    <script src="../js/main.js" defer></script>
+    <script src="../js/cart.js" defer></script>
+    <script src="../js/wishlist.js" defer></script>
 </head>
 
 <body class="font-[&#39;DM_Sans&#39;] bg-gray-50">
@@ -47,9 +51,9 @@
                         </div>
                     </div>
                     <div class="hidden md:ml-4 md:flex md:items-center md:space-x-4">
-                        <button class="p-2 text-gray-500 hover:text-custom">
+                        <a href="Wishlist.html" class="p-2 text-gray-500 hover:text-custom">
                             <i class="far fa-heart"></i>
-                        </button>
+                        </a>
                         <button class="p-2 text-gray-500 hover:text-custom">
                             <i class="far fa-user"></i>
                         </button>
@@ -161,15 +165,16 @@
                                 <div class="mt-6">
                                     <h2 class="text-sm font-medium text-gray-900">Quantity</h2>
                                     <div class="mt-2 flex items-center"><button
-                                            class="border rounded-l-button px-3 py-2 hover:bg-gray-50">-</button><input
+                                            class="border rounded-l-button px-3 py-2 hover:bg-gray-50 quantity-decrease">-</button><input
                                             type="number" min="1" value="1"
-                                            class="w-16 border-t border-b text-center py-2" /><button
-                                            class="border rounded-r-button px-3 py-2 hover:bg-gray-50">+</button></div>
+                                            class="w-16 border-t border-b text-center py-2 quantity-input" /><button
+                                            class="border rounded-r-button px-3 py-2 hover:bg-gray-50 quantity-increase">+</button>
+                                    </div>
                                 </div>
                                 <div class="mt-8 space-y-4"><button
                                         class="w-full bg-custom text-white py-3 px-8 rounded-button hover:bg-custom/90 flex items-center justify-center add-to-cart-btn"><i
                                             class="fas fa-shopping-cart mr-2"></i>Add to Cart</button><button
-                                        class="w-full border border-custom text-custom py-3 px-8 rounded-button hover:bg-custom/10 flex items-center justify-center"><i
+                                        class="w-full border border-custom text-custom py-3 px-8 rounded-button hover:bg-custom/10 flex items-center justify-center add-to-wishlist-btn"><i
                                             class="far fa-heart mr-2"></i>Add to Wishlist</button></div>
                                 <div class="mt-8 border-t pt-8">
                                     <div class="flex items-center"><i class="fas fa-truck text-custom mr-3"></i>
@@ -262,5 +267,6 @@
     </script>
     <script src="../js/database.js"></script>
     <script src="../js/main.js"></script>
+    <script src="../js/cart.js"></script>
     <script src="../js/ui.js"></script>
     <script src="../js/mobile.js"></script>

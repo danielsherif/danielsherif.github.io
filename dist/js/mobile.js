@@ -74,15 +74,30 @@ const BrewAndClayMobile = (function () {
         ".fas.fa-shopping-bag + span, .cart-counter"
       );
       if (cartCounters.length > 0) {
-        const itemCount = cart.reduce(
-          (total, item) => total + item.quantity,
-          0
-        );
-        cartCounters.forEach((counter) => {
-          counter.textContent = itemCount;
-          // Only display the counter if there are items in the cart
-          counter.style.display = itemCount > 0 ? "flex" : "none";
-        });
+        // Get cart from session storage
+        const savedCart = sessionStorage.getItem("brewAndClayCart");
+        if (savedCart) {
+          try {
+            const cart = JSON.parse(savedCart);
+            const itemCount = cart.reduce(
+              (total, item) => total + item.quantity,
+              0
+            );
+            cartCounters.forEach((counter) => {
+              counter.textContent = itemCount;
+              // Only display the counter if there are items in the cart
+              counter.style.display = itemCount > 0 ? "flex" : "none";
+            });
+          } catch (e) {
+            console.error("Error parsing cart from session storage:", e);
+          }
+        } else {
+          // No cart found, hide counters
+          cartCounters.forEach((counter) => {
+            counter.textContent = "0";
+            counter.style.display = "none";
+          });
+        }
       }
     };
   };
@@ -142,12 +157,12 @@ const BrewAndClayMobile = (function () {
     } else {
       // Create default buttons if none exist (excluding shopping bag)
       iconSection.innerHTML = `
-        <button class="p-2 text-gray-500 hover:text-custom">
+        <a href="Wishlist.html" class="p-2 text-gray-500 hover:text-custom">
           <i class="far fa-heart"></i>
-        </button>
-        <button class="p-2 text-gray-500 hover:text-custom">
+        </a>
+        <a href="Login.html" class="p-2 text-gray-500 hover:text-custom">
           <i class="far fa-user"></i>
-        </button>
+        </a>
       `;
     }
     mobileMenu.appendChild(iconSection);
@@ -191,11 +206,17 @@ const BrewAndClayMobile = (function () {
       });
 
       // Setup mobile menu button clicks
-      const mobileButtons = mobileMenu.querySelectorAll("button");
+      const mobileButtons = mobileMenu.querySelectorAll("button, a");
       mobileButtons.forEach((button) => {
+        // Skip anchor tags as they already have href attributes
+        if (button.tagName.toLowerCase() === "a") {
+          return;
+        }
+
+        // Handle button clicks
         if (button.querySelector(".fa-user")) {
           button.addEventListener("click", () => {
-            window.location.href = "SignUp.html";
+            window.location.href = "Login.html";
           });
         }
       });

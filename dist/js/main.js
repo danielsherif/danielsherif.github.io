@@ -10,7 +10,7 @@ const BrewAndClay = (function () {
     const savedCart = sessionStorage.getItem("brewAndClayCart");
     if (savedCart) {
       try {
-        cart = JSON.parse(savedCart);
+        cart = JSON.parse(savedCart) || [];
         console.log("Cart loaded from session storage:", cart);
         updateCartCounter();
       } catch (e) {
@@ -47,17 +47,26 @@ const BrewAndClay = (function () {
 
   // Add item to cart
   const addToCart = (product) => {
+    // Get quantity from product object or input if available
+    let quantity = product.quantity || 1;
+
+    // If quantity not in product object, try to get from input
+    if (!product.quantity) {
+      const quantityInput = document.querySelector(".quantity-input");
+      quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
+    }
+
     // Check if product already exists in cart
     const existingItemIndex = cart.findIndex((item) => item.id === product.id);
 
     if (existingItemIndex >= 0) {
-      // Increment quantity if product already in cart
-      cart[existingItemIndex].quantity += 1;
+      // Add the new quantity to existing quantity
+      cart[existingItemIndex].quantity += quantity;
     } else {
-      // Add new product to cart
+      // Add new product to cart with specified quantity
       cart.push({
         ...product,
-        quantity: 1,
+        quantity: quantity,
       });
     }
 
