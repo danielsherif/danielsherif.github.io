@@ -248,26 +248,41 @@ const BrewAndClayWishlist = (function () {
 
       // Render wishlist items
       wishlist.forEach((item) => {
+        // Try to get the latest product data from database if available
+        let productData = item;
+        if (window.BrewAndClayDB && item.id) {
+          const dbProduct = window.BrewAndClayDB.getProductById(item.id);
+          if (dbProduct) {
+            // Use database product data but keep the item ID from wishlist
+            productData = {
+              ...dbProduct,
+              id: item.id, // Keep the original ID to ensure we can remove it
+            };
+          }
+        }
+
         const wishlistItemElement = document.createElement("div");
         wishlistItemElement.className =
           "flex flex-col md:flex-row border-b border-gray-200 pb-6 mb-6 last:border-0 last:pb-0 last:mb-0";
-        wishlistItemElement.dataset.productId = item.id; // Add product ID as data attribute
+        wishlistItemElement.dataset.productId = productData.id; // Add product ID as data attribute
         wishlistItemElement.innerHTML = `
           <div class="md:w-1/4 mb-4 md:mb-0">
-            <img src="${item.image}" alt="${
-          item.name
-        }" class="w-full h-auto rounded-lg" />
+            <img src="${productData.image}" alt="${
+          productData.name
+        }" class="w-full h-auto rounded-lg" onerror="this.src='../MugImages/1.png'" />
           </div>
           <div class="md:w-3/4 md:pl-6 flex flex-col">
             <div class="flex justify-between mb-2">
-              <h3 class="text-lg font-medium text-gray-900">${item.name}</h3>
+              <h3 class="text-lg font-medium text-gray-900">${
+                productData.name
+              }</h3>
               <button class="text-gray-400 hover:text-red-500 remove-item-btn">
                 <i class="fas fa-times"></i>
               </button>
             </div>
-            <p class="text-gray-500 mb-4">${item.description || ""}</p>
+            <p class="text-gray-500 mb-4">${productData.description || ""}</p>
             <div class="mt-auto flex flex-col sm:flex-row sm:justify-between sm:items-center">
-              <span class="text-lg font-medium text-custom mb-4 sm:mb-0">EGP ${item.price.toFixed(
+              <span class="text-lg font-medium text-custom mb-4 sm:mb-0">EGP ${productData.price.toFixed(
                 2
               )}</span>
               <div class="flex space-x-2">
@@ -333,11 +348,20 @@ const BrewAndClayWishlist = (function () {
             .querySelector(".text-2xl.font-bold.text-custom")
             ?.textContent.replace("EGP ", "")
         );
+        // Get the main product image (first image in the product view)
         const productImage = document.querySelector(
           ".aspect-w-1.aspect-h-1 img"
         )?.src;
+
+        // If image is not found or is empty, try to get it from the database
         // Try to get product ID from URL parameters first
         let productId = new URLSearchParams(window.location.search).get("id");
+
+        // If we have a product ID, try to get the product from the database
+        let dbProduct = null;
+        if (productId && window.BrewAndClayDB) {
+          dbProduct = window.BrewAndClayDB.getProductById(productId);
+        }
 
         // If no ID in URL, generate a unique ID based on product name
         if (!productId && productName) {
@@ -346,12 +370,17 @@ const BrewAndClayWishlist = (function () {
             .replace(/\s+/g, "-")}-${Date.now()}`;
         }
 
-        if (productId && productName && productPrice && productImage) {
+        // If we have a product from the database, use that information
+        if (dbProduct) {
+          addToWishlist(dbProduct);
+        }
+        // Otherwise use the information from the page
+        else if (productId && productName && productPrice && productImage) {
           const product = {
             id: productId,
             name: productName,
             price: productPrice,
-            image: productImage,
+            image: productImage || "../MugImages/1.png", // Fallback image only if needed
           };
 
           addToWishlist(product);
