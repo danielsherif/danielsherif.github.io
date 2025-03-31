@@ -161,7 +161,8 @@ const BrewAndClayWishlist = (function () {
         ...item,
         quantity: 1, // Ensure quantity is set when moving to cart
       };
-      BrewAndClay.addToCart(cartItem);
+      // Use BrewAndClayCart instead of BrewAndClay to add to cart
+      BrewAndClayCart.addToCart(cartItem);
       // Remove from wishlist
       removeFromWishlist(productId);
     }

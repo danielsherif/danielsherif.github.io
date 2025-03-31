@@ -239,7 +239,7 @@ const BrewAndClayUI = (function () {
             e.stopPropagation(); // Prevent event bubbling
             const product = BrewAndClayDB.getProductById(productId);
             if (product) {
-              BrewAndClay.addToCart(product);
+              BrewAndClayCart.addToCart(product);
             }
           });
         }
@@ -859,7 +859,7 @@ const BrewAndClayUI = (function () {
         const button = productCard.querySelector("button");
         button.addEventListener("click", (e) => {
           e.stopPropagation(); // Prevent event bubbling
-          BrewAndClay.addToCart(product);
+          BrewAndClayCart.addToCart(product);
         });
 
         // Make the entire card clickable for better UX
@@ -1040,7 +1040,7 @@ const BrewAndClayUI = (function () {
     const addToCartButton = document.querySelector(".add-to-cart-btn");
     if (addToCartButton) {
       addToCartButton.addEventListener("click", () => {
-        BrewAndClay.addToCart(product);
+        BrewAndClayCart.addToCart(product);
       });
     }
   };
