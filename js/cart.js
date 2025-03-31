@@ -86,7 +86,7 @@ const BrewAndClayCart = (function () {
     // If logged in, also save to server
     if (isLoggedIn && user && user.token) {
       try {
-        // Get current server cart
+        // Get current cart from server
         const response = await fetch(`${API_URL}/cart`, {
           method: "GET",
           headers: {
@@ -95,36 +95,23 @@ const BrewAndClayCart = (function () {
           },
         });
 
-        // If cart exists on server, clear it first to ensure sync
         if (response.ok) {
-          // Clear the server cart only if we have items to add
-          // This prevents clearing the cart when we're just checking it
-          if (cart.length > 0) {
+          // For each item in the local cart
+          for (const item of cart) {
             await fetch(`${API_URL}/cart`, {
-              method: "DELETE",
+              method: "POST",
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${user.token}`,
               },
+              body: JSON.stringify({
+                productId: item.id,
+                name: item.name,
+                price: item.price,
+                image: item.image,
+                quantity: item.quantity,
+              }),
             });
-
-            // Then add each item to the server cart
-            for (const item of cart) {
-              await fetch(`${API_URL}/cart`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${user.token}`,
-                },
-                body: JSON.stringify({
-                  productId: item.id,
-                  name: item.name,
-                  price: item.price,
-                  image: item.image,
-                  quantity: item.quantity,
-                }),
-              });
-            }
           }
         }
       } catch (error) {

@@ -1040,7 +1040,7 @@ const BrewAndClayUI = (function () {
     const addToCartButton = document.querySelector(".add-to-cart-btn");
     if (addToCartButton) {
       addToCartButton.addEventListener("click", () => {
-        BrewAndClayCart.addToCart(product);
+        BrewAndClay.addToCart(product);
       });
     }
   };
@@ -1068,7 +1068,7 @@ const BrewAndClayUI = (function () {
 
   // Render cart items
   const renderCart = () => {
-    const cartItems = BrewAndClayCart.getCart();
+    const cartItems = BrewAndClay.getCart();
     const cartContainer = document.querySelector(".cart-items");
     const orderSummaryContainer = document.querySelector(
       ".space-y-2.pb-4.border-b"
@@ -1113,26 +1113,7 @@ const BrewAndClayUI = (function () {
           }" class="w-20 h-20 object-cover rounded-md" />
               <div>
                 <h3 class="font-medium text-gray-900">${item.name}</h3>
-                <div class="flex items-center mt-2">
-                  <span class="text-sm text-gray-500 mr-2">Qty:</span>
-                  <div class="flex items-center border border-gray-300 rounded-md">
-                    <button class="px-2 py-1 text-gray-500 hover:text-custom quantity-decrease" data-product-id="${
-                      item.id
-                    }">
-                      <i class="fas fa-minus"></i>
-                    </button>
-                    <input type="number" value="${
-                      item.quantity
-                    }" min="1" class="w-12 text-center border-0 focus:ring-0 cart-quantity-input" data-product-id="${
-            item.id
-          }">
-                    <button class="px-2 py-1 text-gray-500 hover:text-custom quantity-increase" data-product-id="${
-                      item.id
-                    }">
-                      <i class="fas fa-plus"></i>
-                    </button>
-                  </div>
-                </div>
+                <p class="text-sm text-gray-500">Qty: ${item.quantity}</p>
               </div>
             </div>
             <div class="flex items-center space-x-4">
@@ -1145,49 +1126,11 @@ const BrewAndClayUI = (function () {
             </div>
           `;
 
-          // Add event listeners for quantity controls and remove button
+          // Add event listener for remove button
           const removeBtn = cartItemElement.querySelector(".remove-item-btn");
-          const decreaseBtn =
-            cartItemElement.querySelector(".quantity-decrease");
-          const increaseBtn =
-            cartItemElement.querySelector(".quantity-increase");
-          const quantityInput = cartItemElement.querySelector(
-            ".cart-quantity-input"
-          );
-
-          // Remove button
           removeBtn.addEventListener("click", () => {
-            BrewAndClayCart.removeFromCart(item.id);
+            BrewAndClay.removeFromCart(item.id);
             renderCart(); // Re-render cart after update
-          });
-
-          // Decrease quantity button
-          decreaseBtn.addEventListener("click", () => {
-            const currentQty = parseInt(quantityInput.value) || 1;
-            if (currentQty > 1) {
-              BrewAndClayCart.updateCartItemQuantity(item.id, currentQty - 1);
-              renderCart(); // Re-render cart after update
-            }
-          });
-
-          // Increase quantity button
-          increaseBtn.addEventListener("click", () => {
-            const currentQty = parseInt(quantityInput.value) || 1;
-            BrewAndClayCart.updateCartItemQuantity(item.id, currentQty + 1);
-            renderCart(); // Re-render cart after update
-          });
-
-          // Quantity input change
-          quantityInput.addEventListener("change", () => {
-            let newQty = parseInt(quantityInput.value) || 1;
-            if (newQty < 1) newQty = 1;
-            BrewAndClayCart.updateCartItemQuantity(item.id, newQty);
-            renderCart(); // Re-render cart after update
-          });
-
-          // Prevent scrolling on number input with mouse wheel
-          quantityInput.addEventListener("wheel", (e) => {
-            e.preventDefault();
           });
 
           fragment.appendChild(cartItemElement);
@@ -1276,7 +1219,7 @@ const BrewAndClayUI = (function () {
 
   // Checkout page initialization
   const initCheckoutPage = () => {
-    const cartItems = BrewAndClayCart.getCart();
+    const cartItems = BrewAndClay.getCart();
     const orderSummaryContainer = document.querySelector(
       ".space-y-2.pb-4.border-b"
     );

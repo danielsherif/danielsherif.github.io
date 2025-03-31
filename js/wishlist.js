@@ -89,7 +89,7 @@ const BrewAndClayWishlist = (function () {
     // If logged in, also save to server
     if (isLoggedIn && user && user.token) {
       try {
-        // Get current server wishlist
+        // Get current wishlist from server
         const response = await fetch(`${API_URL}/wishlist`, {
           method: "GET",
           headers: {
@@ -98,21 +98,16 @@ const BrewAndClayWishlist = (function () {
           },
         });
 
-        // If wishlist exists on server, clear it first to ensure sync
         if (response.ok) {
-          // Clear the server wishlist only if we have items to add
-          // This prevents clearing the wishlist when we're just checking it
-          if (wishlist.length > 0) {
-            await fetch(`${API_URL}/wishlist`, {
-              method: "DELETE",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${user.token}`,
-              },
-            });
+          // For each item in the local wishlist
+          for (const item of wishlist) {
+            // Check if item already exists in wishlist on server
+            const itemExists = (await response.json()).items.some(
+              (serverItem) => serverItem.productId === item.id
+            );
 
-            // Then add each item to the server wishlist
-            for (const item of wishlist) {
+            // Only add if it doesn't exist
+            if (!itemExists) {
               await fetch(`${API_URL}/wishlist`, {
                 method: "POST",
                 headers: {
