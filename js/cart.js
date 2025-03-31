@@ -86,31 +86,46 @@ const BrewAndClayCart = (function () {
     // If logged in, also save to server
     if (isLoggedIn && user && user.token) {
       try {
-        // First clear the server cart
-        await fetch(`${API_URL}/cart`, {
-          method: "DELETE",
+        // Get current server cart
+        const response = await fetch(`${API_URL}/cart`, {
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${user.token}`,
           },
         });
 
-        // Then add each item to the server cart
-        for (const item of cart) {
-          await fetch(`${API_URL}/cart`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-            body: JSON.stringify({
-              productId: item.id,
-              name: item.name,
-              price: item.price,
-              image: item.image,
-              quantity: item.quantity,
-            }),
-          });
+        // If cart exists on server, clear it first to ensure sync
+        if (response.ok) {
+          // Clear the server cart only if we have items to add
+          // This prevents clearing the cart when we're just checking it
+          if (cart.length > 0) {
+            await fetch(`${API_URL}/cart`, {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${user.token}`,
+              },
+            });
+
+            // Then add each item to the server cart
+            for (const item of cart) {
+              await fetch(`${API_URL}/cart`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${user.token}`,
+                },
+                body: JSON.stringify({
+                  productId: item.id,
+                  name: item.name,
+                  price: item.price,
+                  image: item.image,
+                  quantity: item.quantity,
+                }),
+              });
+            }
+          }
         }
       } catch (error) {
         console.error("Error saving cart to server:", error);

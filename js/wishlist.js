@@ -89,30 +89,45 @@ const BrewAndClayWishlist = (function () {
     // If logged in, also save to server
     if (isLoggedIn && user && user.token) {
       try {
-        // First clear the server wishlist
-        await fetch(`${API_URL}/wishlist`, {
-          method: "DELETE",
+        // Get current server wishlist
+        const response = await fetch(`${API_URL}/wishlist`, {
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${user.token}`,
           },
         });
 
-        // Then add each item to the server wishlist
-        for (const item of wishlist) {
-          await fetch(`${API_URL}/wishlist`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-            body: JSON.stringify({
-              productId: item.id,
-              name: item.name,
-              price: item.price,
-              image: item.image,
-            }),
-          });
+        // If wishlist exists on server, clear it first to ensure sync
+        if (response.ok) {
+          // Clear the server wishlist only if we have items to add
+          // This prevents clearing the wishlist when we're just checking it
+          if (wishlist.length > 0) {
+            await fetch(`${API_URL}/wishlist`, {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${user.token}`,
+              },
+            });
+
+            // Then add each item to the server wishlist
+            for (const item of wishlist) {
+              await fetch(`${API_URL}/wishlist`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${user.token}`,
+                },
+                body: JSON.stringify({
+                  productId: item.id,
+                  name: item.name,
+                  price: item.price,
+                  image: item.image,
+                }),
+              });
+            }
+          }
         }
       } catch (error) {
         console.error("Error saving wishlist to server:", error);

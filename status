@@ -16,21 +16,28 @@
 
 What needs to be done?
 
+
+⟢ Featured products should be a slider and change
+⟢ Newsletter / Mail integration for news letter
 ⟢ Profile page for when youre logged in
-⟢ Make the login and sign up actually do something and link carts 
-⟢ Wishlist and link to DB
+⟢ Linking carts and wishlist database
 ⟢ Add animations
 ⟢ Fix routing
 ⟢ Product status
 ⟢ Products and description and quantity
 ⟢ Implement app to easily modify and update 
-
+⟢ Recommend similar products based on similarity
 
 
 
 Bugs
 -Search bar missing in mobile
-
+-All icons missing in mobile
+-Remove paging from product 
 
 Improvements
 -Making filter in mobile a button instead of always on display
+
+
+status
+Born from a deep love of coffee, our aim was to spread our love of coffee and pottery in the best possible way. We’ve created this space to showcase unique, handcrafted mugs that elevate your coffee experience. Each piece is unique in the sense that there are no two mugs that are identical as each is handcrafted in a special way. Our mission is simple: to help coffee lovers everywhere enjoy their brews in a way that feels elegant and true to their personal style
