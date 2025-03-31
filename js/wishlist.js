@@ -89,16 +89,8 @@ const BrewAndClayWishlist = (function () {
     // If logged in, also save to server
     if (isLoggedIn && user && user.token) {
       try {
-        // First clear the server wishlist
-        await fetch(`${API_URL}/wishlist`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
-
-        // Then add each item to the server wishlist
+        // For each item in the local wishlist, ensure it exists on the server
+        // This approach is more reliable than deleting everything and re-adding
         for (const item of wishlist) {
           await fetch(`${API_URL}/wishlist`, {
             method: "POST",
@@ -114,6 +106,9 @@ const BrewAndClayWishlist = (function () {
             }),
           });
         }
+
+        // Note: We're not clearing the server wishlist first anymore
+        // The API will handle duplicates by ignoring them
       } catch (error) {
         console.error("Error saving wishlist to server:", error);
       }
@@ -161,8 +156,12 @@ const BrewAndClayWishlist = (function () {
   const moveToCart = (productId) => {
     const item = wishlist.find((item) => item.id === productId);
     if (item) {
-      // Add to cart
-      BrewAndClay.addToCart(item);
+      // Add to cart with quantity of 1
+      const cartItem = {
+        ...item,
+        quantity: 1, // Ensure quantity is set when moving to cart
+      };
+      BrewAndClay.addToCart(cartItem);
       // Remove from wishlist
       removeFromWishlist(productId);
     }

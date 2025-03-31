@@ -512,23 +512,22 @@ app.post("/api/wishlist", protect, async (req, res) => {
     }
 
     // Check if item already exists in wishlist
-    const itemExists = wishlist.items.some(
+    const itemIndex = wishlist.items.findIndex(
       (item) => item.productId === productId
     );
 
-    if (itemExists) {
-      return res
-        .status(400)
-        .json({ message: "Item already exists in wishlist" });
+    if (itemIndex > -1) {
+      // Item already exists, just return success
+      return res.status(200).json(wishlist);
+    } else {
+      // Add new item
+      wishlist.items.push({
+        productId,
+        name,
+        price,
+        image,
+      });
     }
-
-    // Add new item
-    wishlist.items.push({
-      productId,
-      name,
-      price,
-      image,
-    });
 
     wishlist.updatedAt = Date.now();
     await wishlist.save();
