@@ -89,40 +89,30 @@ const BrewAndClayWishlist = (function () {
     // If logged in, also save to server
     if (isLoggedIn && user && user.token) {
       try {
-        // Get current wishlist from server
-        const response = await fetch(`${API_URL}/wishlist`, {
-          method: "GET",
+        // First clear the server wishlist
+        await fetch(`${API_URL}/wishlist`, {
+          method: "DELETE",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${user.token}`,
           },
         });
 
-        if (response.ok) {
-          // For each item in the local wishlist
-          for (const item of wishlist) {
-            // Check if item already exists in wishlist on server
-            const itemExists = (await response.json()).items.some(
-              (serverItem) => serverItem.productId === item.id
-            );
-
-            // Only add if it doesn't exist
-            if (!itemExists) {
-              await fetch(`${API_URL}/wishlist`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${user.token}`,
-                },
-                body: JSON.stringify({
-                  productId: item.id,
-                  name: item.name,
-                  price: item.price,
-                  image: item.image,
-                }),
-              });
-            }
-          }
+        // Then add each item to the server wishlist
+        for (const item of wishlist) {
+          await fetch(`${API_URL}/wishlist`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${user.token}`,
+            },
+            body: JSON.stringify({
+              productId: item.id,
+              name: item.name,
+              price: item.price,
+              image: item.image,
+            }),
+          });
         }
       } catch (error) {
         console.error("Error saving wishlist to server:", error);
