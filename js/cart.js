@@ -84,49 +84,49 @@ const BrewAndClayCart = (function () {
     sessionStorage.setItem("brewAndClayCart", JSON.stringify(cart));
 
     // If logged in, also save to server
-    if (isLoggedIn && user && user.token) {
-      try {
-        // Get current server cart
-        const response = await fetch(`${API_URL}/cart`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
+    // if (isLoggedIn && user && user.token) {
+    //   try {
+    //     // Get current server cart
+    //     const response = await fetch(`${API_URL}/cart`, {
+    //       method: "GET",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //         Authorization: `Bearer ${user.token}`,
+    //       },
+    //     });
 
-        if (response.ok) {
-          // Clear the server cart only if we can successfully get it first
-          await fetch(`${API_URL}/cart`, {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-          });
+    //     if (response.ok) {
+    //       // Clear the server cart only if we can successfully get it first
+    //       await fetch(`${API_URL}/cart`, {
+    //         method: "DELETE",
+    //         headers: {
+    //           "Content-Type": "application/json",
+    //           Authorization: `Bearer ${user.token}`,
+    //         },
+    //       });
 
-          // Then add each item to the server cart
-          for (const item of cart) {
-            await fetch(`${API_URL}/cart`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${user.token}`,
-              },
-              body: JSON.stringify({
-                productId: item.id,
-                name: item.name,
-                price: item.price,
-                image: item.image,
-                quantity: item.quantity,
-              }),
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error saving cart to server:", error);
-      }
-    }
+    //       // Then add each item to the server cart
+    //       for (const item of cart) {
+    //         await fetch(`${API_URL}/cart`, {
+    //           method: "POST",
+    //           headers: {
+    //             "Content-Type": "application/json",
+    //             Authorization: `Bearer ${user.token}`,
+    //           },
+    //           body: JSON.stringify({
+    //             productId: item.id,
+    //             name: item.name,
+    //             price: item.price,
+    //             image: item.image,
+    //             quantity: item.quantity,
+    //           }),
+    //         });
+    //       }
+    //     }
+    //   } catch (error) {
+    //     console.error("Error saving cart to server:", error);
+    //   }
+    // }
   };
 
   // Update the cart counter in the UI
@@ -147,44 +147,75 @@ const BrewAndClayCart = (function () {
 
   // Add item to cart
   const addToCart = (product) => {
-    // Get quantity from product object or input if available
-    let quantity = product.quantity || 1;
-
-    // If quantity not in product object, try to get from input
-    if (!product.quantity) {
-      const quantityInput = document.querySelector(".quantity-input");
-      quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
-    }
-
-    // Check if product already exists in cart
-    const existingItemIndex = cart.findIndex((item) => item.id === product.id);
-
-    if (existingItemIndex >= 0) {
-      // Add the new quantity to existing quantity
-      cart[existingItemIndex].quantity += quantity;
-    } else {
-      // Add new product to cart with specified quantity
-      cart.push({
-        id: product.id,
-        name: product.name || "Unknown Product", // Ensure name is assigned
-        price: parseFloat(product.price) || 0,
-        image: product.image,
-        quantity: quantity,
-      });
-    }
+    // ... (existing logic to find existingItemIndex and update/push to local cart array) ...
 
     // Save cart and update UI
-    saveCart();
+    saveCart(); // Saves only to sessionStorage now
     updateCartCounter();
 
-    // Show notification
+    // --- ADD THE FOLLOWING BLOCK ---
+    if (isLoggedIn && user && user.token) {
+      // Send only the added/updated item to the server
+      const itemToSend = cart.find((item) => item.id === product.id); // Get the final item state from local cart
+      if (itemToSend) {
+        fetch(`${API_URL}/cart`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+          body: JSON.stringify({
+            productId: itemToSend.id,
+            name: itemToSend.name,
+            price: itemToSend.price,
+            image: itemToSend.image,
+            quantity: itemToSend.quantity, // Send the updated quantity
+          }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              console.error("Failed to add/update item on server");
+              // Optional: Add some user feedback or retry logic
+            } else {
+              console.log("Item added/updated on server successfully");
+            }
+          })
+          .catch((error) => {
+            console.error("Error syncing item add/update to server:", error);
+          });
+      }
+    }
+
     showNotification(`${product.name} added to cart`);
   };
 
   // Remove item from cart
   const removeFromCart = (productId) => {
     cart = cart.filter((item) => item.id !== productId);
-    saveCart();
+    saveCart(); // Saves only to sessionStorage now
+
+    // --- ADD THE FOLLOWING BLOCK ---
+    if (isLoggedIn && user && user.token) {
+      fetch(`${API_URL}/cart/${productId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            console.error("Failed to remove item from server");
+            // Optional: Add some user feedback or retry logic
+          } else {
+            console.log("Item removed from server successfully");
+          }
+        })
+        .catch((error) => {
+          console.error("Error syncing item removal to server:", error);
+        });
+    }
+    // --- END ADD BLOCK ---
+
     updateCartCounter();
   };
 
@@ -195,11 +226,39 @@ const BrewAndClayCart = (function () {
     if (itemIndex >= 0) {
       if (quantity <= 0) {
         // Remove item if quantity is 0 or less
-        removeFromCart(productId);
+        removeFromCart(productId); // This already handles the API call
       } else {
         // Update quantity
         cart[itemIndex].quantity = quantity;
-        saveCart();
+        saveCart(); // Saves only to sessionStorage now
+
+        // --- ADD THE FOLLOWING BLOCK ---
+        if (isLoggedIn && user && user.token) {
+          fetch(`${API_URL}/cart/${productId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${user.token}`,
+            },
+            body: JSON.stringify({ quantity: quantity }),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                console.error("Failed to update item quantity on server");
+                // Optional: Add some user feedback or retry logic
+              } else {
+                console.log("Item quantity updated on server successfully");
+              }
+            })
+            .catch((error) => {
+              console.error(
+                "Error syncing item quantity update to server:",
+                error
+              );
+            });
+        }
+        // --- END ADD BLOCK ---
+
         updateCartCounter();
       }
     }

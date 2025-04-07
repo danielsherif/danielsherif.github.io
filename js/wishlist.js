@@ -87,32 +87,32 @@ const BrewAndClayWishlist = (function () {
     localStorage.setItem("brewAndClayWishlist", JSON.stringify(wishlist));
 
     // If logged in, also save to server
-    if (isLoggedIn && user && user.token) {
-      try {
-        // For each item in the local wishlist, ensure it exists on the server
-        // This approach is more reliable than deleting everything and re-adding
-        for (const item of wishlist) {
-          await fetch(`${API_URL}/wishlist`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-            body: JSON.stringify({
-              productId: item.id,
-              name: item.name,
-              price: item.price,
-              image: item.image,
-            }),
-          });
-        }
+    // if (isLoggedIn && user && user.token) {
+    //   try {
+    //     // For each item in the local wishlist, ensure it exists on the server
+    //     // This approach is more reliable than deleting everything and re-adding
+    //     for (const item of wishlist) {
+    //       await fetch(`${API_URL}/wishlist`, {
+    //         method: "POST",
+    //         headers: {
+    //           "Content-Type": "application/json",
+    //           Authorization: `Bearer ${user.token}`,
+    //         },
+    //         body: JSON.stringify({
+    //           productId: item.id,
+    //           name: item.name,
+    //           price: item.price,
+    //           image: item.image,
+    //         }),
+    //       });
+    //     }
 
-        // Note: We're not clearing the server wishlist first anymore
-        // The API will handle duplicates by ignoring them
-      } catch (error) {
-        console.error("Error saving wishlist to server:", error);
-      }
-    }
+    //     // Note: We're not clearing the server wishlist first anymore
+    //     // The API will handle duplicates by ignoring them
+    //   } catch (error) {
+    //     console.error("Error saving wishlist to server:", error);
+    //   }
+    // }
   };
 
   // Add item to wishlist
@@ -141,14 +141,72 @@ const BrewAndClayWishlist = (function () {
     });
 
     // Save wishlist and show notification
-    saveWishlist();
+    saveWishlist(); // Saves only to localStorage now
+
+    // --- ADD THE FOLLOWING BLOCK ---
+    if (isLoggedIn && user && user.token) {
+      fetch(`${API_URL}/wishlist`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({
+          productId: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+        }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            // Handle cases like 400 Bad Request (already exists) gracefully
+            if (response.status !== 400) {
+              console.error("Failed to add item to server wishlist");
+              // Optional: Add some user feedback or retry logic
+            } else {
+              console.log("Item likely already on server wishlist.");
+            }
+          } else {
+            console.log("Item added to server wishlist successfully");
+          }
+        })
+        .catch((error) => {
+          console.error("Error syncing item add to server wishlist:", error);
+        });
+    }
     showNotification(`${product.name} added to wishlist`);
   };
 
   // Remove item from wishlist
   const removeFromWishlist = (productId) => {
     wishlist = wishlist.filter((item) => item.id !== productId);
-    saveWishlist();
+    saveWishlist(); // Saves only to localStorage now
+
+    // --- ADD THE FOLLOWING BLOCK ---
+    if (isLoggedIn && user && user.token) {
+      fetch(`${API_URL}/wishlist/${productId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            console.error("Failed to remove item from server wishlist");
+            // Optional: Add some user feedback or retry logic
+          } else {
+            console.log("Item removed from server wishlist successfully");
+          }
+        })
+        .catch((error) => {
+          console.error(
+            "Error syncing item removal from server wishlist:",
+            error
+          );
+        });
+    }
+
     renderWishlist(); // Re-render wishlist after update
   };
 
